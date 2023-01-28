@@ -16,6 +16,8 @@ class BlogsDatabase {
             Log.d("BlogFbDatabaseLogs","resultsFetched after converting to objects: \n$results")
             results
         }catch(e:Exception){
+            Log.d("BlogFbDatabaseLogs","fetching failed ${e.message}")
+            Log.d("BlogFbDatabaseLogs","fetching failed ${e.stackTrace}")
             emptyList()
         }
     }
