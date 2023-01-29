@@ -51,10 +51,26 @@ class HomeFeedAdapter @Inject constructor(
             postTitle.text = blogs[position].Title
             postContent.text = blogs[position].Content
             glide.load(blogs[position].imageUrl).into(postThumbnail)
+
         }
+
+        holder.binding.root.setOnClickListener {
+            clickListener?.let { click ->
+                click( blogs[position].articleId )
+            }
+        }
+
+
+
     }
+
+    private var clickListener:((blogDocId:String)->Unit)? = null
 
     override fun getItemCount(): Int {
         return blogs.size
+    }
+
+    fun setClickListener( listener:(blogDocId:String)->Unit ){
+        clickListener = listener
     }
 }

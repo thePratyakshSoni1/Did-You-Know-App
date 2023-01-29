@@ -6,7 +6,6 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.example.didyouknow.R
 import com.example.didyouknow.data.remote.BlogsDatabase
-import com.example.didyouknow.datasource.FirebaseBlogsDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

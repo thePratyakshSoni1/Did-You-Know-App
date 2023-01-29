@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.didyouknow.R
 import com.example.didyouknow.adapters.HomeFeedAdapter
@@ -48,6 +49,12 @@ class HomeFeedFragment : Fragment() {
         Toast.makeText(requireContext(),"You Are in HomeFrag", Toast.LENGTH_SHORT).show()
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = blogsAdapter
+        blogsAdapter.setClickListener {
+
+            val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it)
+            findNavController().navigate(action)
+
+        }
 
         viewModel.blogPosts.observe(viewLifecycleOwner){
             Toast.makeText(requireContext(),"Updating blogs", Toast.LENGTH_SHORT).show()

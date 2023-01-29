@@ -4,16 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
     app:startDestination="@id/homeFeedFragment">
-
-    <fragment
-        android:id="@+id/homeFeedFragment"
-        android:name="com.example.didyouknow.ui.fragments.HomeFeedFragment"
-        android:label="fragment_home_feed"
-        tools:layout="@layout/fragment_home_feed" >
-        <action
-            android:id="@+id/action_homeFeedFragment_to_addPostFragment"
-            app:destination="@id/addPostFragment" />
-    </fragment>
     <fragment
         android:id="@+id/addPostFragment"
         android:name="com.example.didyouknow.ui.fragments.AddPostFragment"
@@ -21,5 +11,28 @@
         <action
             android:id="@+id/action_addPostFragment_to_homeFeedFragment"
             app:destination="@id/homeFeedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/blogDetailFragment"
+        android:name="com.example.didyouknow.ui.fragments.BlogDetailFragment"
+        android:label="BlogDetailFragment" >
+        <action
+            android:id="@+id/action_blogDetailFragment_to_homeFeedFragment"
+            app:destination="@id/homeFeedFragment" />
+        <argument
+            android:name="blogDocId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeFeedFragment"
+        android:name="com.example.didyouknow.ui.fragments.HomeFeedFragment"
+        android:label="HomeFeedFragment" >
+        <action
+            android:id="@+id/action_homeFeedFragment_to_blogDetailFragment3"
+            app:destination="@id/blogDetailFragment"
+            />
+        <action
+            android:id="@+id/action_homeFeedFragment_to_addPostFragment"
+            app:destination="@id/addPostFragment" />
     </fragment>
 </navigation>
