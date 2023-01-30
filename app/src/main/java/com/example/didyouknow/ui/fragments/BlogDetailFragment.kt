@@ -62,7 +62,7 @@ class BlogDetailFragment : Fragment() {
                             toggleBlogVisibility( setBlogToVisible = true )
                             binding.postTitle.text = blog.Title
                             binding.postContent.text = blog.Content
-                            binding.date.text = SimpleDateFormat("dd M yyyy").format( blog.Date )
+                            binding.date.text = SimpleDateFormat("dd MMMM yyyy").format( blog.Date )
 
                             glide.load(blog.imageUrl).into(binding.postThumbnail)
                             Log.d("BlogDetailsFragmentLogs", "Blogs Update Succesfully & ui is too")

@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="homefeed_background">#E9E9E9</color>
+    <color name="post_text">#000000</color>
+    <color name="button_icons_tint">#474747</color>
+    <color name="toolbar">#FFFFFF</color>
+    <color name="toolbar_text">#000000</color>
+    <color name="post_background">#FFFFFF</color>
+
 </resources>
