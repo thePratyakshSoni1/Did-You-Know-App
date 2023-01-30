@@ -8,14 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.didyouknow.R
 import com.example.didyouknow.databinding.FragmentBlogDetailBinding
-import com.example.didyouknow.databinding.FragmentHomeFeedBinding
 import com.example.didyouknow.other.Status
 import com.example.didyouknow.ui.viewmodels.BlogDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 
@@ -48,6 +47,10 @@ class BlogDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+
         viewModel.initializeViewModel(arguments?.getString("blogDocId")!!)
         viewModel.blog.observe(viewLifecycleOwner){
 
@@ -60,9 +63,11 @@ class BlogDetailFragment : Fragment() {
                         if(blog != null){
 
                             toggleBlogVisibility( setBlogToVisible = true )
-                            binding.postTitle.text = blog.Title
-                            binding.postContent.text = blog.Content
-                            binding.date.text = SimpleDateFormat("dd MMMM yyyy").format( blog.Date )
+                            binding.postTitle.text = blog.title
+                            binding.postContent.text = blog.content
+                            binding.date.text = SimpleDateFormat("dd MMMM yyyy").format( blog.date )
+                            binding.dislikeCountTxt.text = blog.totalDislikes.toString()
+                            binding.likeCountTxt.text = blog.totalLikes.toString()
 
                             glide.load(blog.imageUrl).into(binding.postThumbnail)
                             Log.d("BlogDetailsFragmentLogs", "Blogs Update Succesfully & ui is too")

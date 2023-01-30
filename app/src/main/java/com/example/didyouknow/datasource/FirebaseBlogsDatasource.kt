@@ -25,10 +25,12 @@ class FirebaseBlogsDatasource @Inject constructor(
     suspend fun fetchBlogById(blogId:String):Resources<BlogPost?>{
 
         val requiredBlogPost:BlogPost = blogsDatabse.getBlogById(blogId)!!
-         Log.d("FirebaseSourceLogs","Success Fetching: ${requiredBlogPost.Title}")
+         Log.d("FirebaseSourceLogs","Success Fetching: ${requiredBlogPost.title}")
         return Resources.success(requiredBlogPost)
 
     }
+
+    suspend fun postBlog( blog:BlogPost ):Resources<Boolean> = blogsDatabse.postBlog(blog)
 
 
 }

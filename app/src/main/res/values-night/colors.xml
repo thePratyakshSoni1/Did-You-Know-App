@@ -9,5 +9,10 @@
     <color name="toolbar_text">#FFFFFF</color>
     <color name="post_background">#1F1F1F</color>
 
+    <color name="add_post_text_field">#202020</color>
+    <color name="add_post_hint">#787878</color>
+    <color name="add_post_text">#E9E9E9</color>
+    <color name="add_post_fragment_background">#000000</color>
+
 
 </resources>

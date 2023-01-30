@@ -3,7 +3,6 @@ package com.example.didyouknow.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -48,8 +47,8 @@ class HomeFeedAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: HomeFeedAdapterViewholder, position: Int) {
         holder.binding.apply {
-            postTitle.text = blogs[position].Title
-            postContent.text = blogs[position].Content
+            postTitle.text = blogs[position].title
+            postContent.text = blogs[position].content
             glide.load(blogs[position].imageUrl).into(postThumbnail)
 
         }

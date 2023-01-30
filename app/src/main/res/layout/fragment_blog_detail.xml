@@ -13,6 +13,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/toolbar"
+                android:elevation="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationIcon="@drawable/ic_back"
+                app:subtitleTextColor="@color/toolbar_text"
+                app:title="Did You Know"
+                app:titleTextColor="@color/toolbar_text" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"
                 android:layout_width="match_parent"
@@ -22,7 +36,7 @@
                 app:cardCornerRadius="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
                 <ImageView
                     android:id="@+id/postThumbnail"
@@ -38,9 +52,9 @@
                 android:id="@+id/postTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginEnd="14dp"
+                android:layout_marginEnd="16dp"
                 android:textColor="@color/post_text"
                 android:textSize="18dp"
                 android:textStyle="bold"
@@ -71,8 +85,7 @@
                     android:layout_weight="1"
                     android:text="28 Jan 2023"
                     android:textAlignment="viewStart"
-                    android:textColor="@color/post_text"
-                    android:textSize="18sp" />
+                    android:textColor="@color/post_text"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -88,7 +101,7 @@
 
                         <Button
                             android:id="@+id/postLikeButton"
-                            style="@style/Widget.AppCompat.Button.Borderless"
+                            style="@style/Widget.Material3.Button.Icon"
                             android:layout_width="54dp"
                             android:layout_height="64dp"
                             android:backgroundTint="@color/white"
@@ -113,7 +126,7 @@
 
                         <Button
                             android:id="@+id/postDislikeButton"
-                            style="@style/Widget.AppCompat.Button.Borderless"
+                            style="@style/Widget.Material3.Button.Icon"
                             android:layout_width="54dp"
                             android:layout_height="64dp"
                             android:backgroundTint="@color/white"
@@ -142,7 +155,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="14dp"
                 android:textColor="@color/post_text"
-                android:textSize="14dp"
+                android:textSize="16sp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

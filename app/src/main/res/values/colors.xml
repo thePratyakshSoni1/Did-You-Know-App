@@ -15,4 +15,9 @@
     <color name="toolbar_text">#000000</color>
     <color name="post_background">#FFFFFF</color>
 
+    <color name="add_post_text_field">#E9E9E9</color>
+    <color name="add_post_hint">#C8C8C8</color>
+    <color name="add_post_text">#000000</color>
+    <color name="add_post_fragment_background">#FFFFFF</color>
+
 </resources>

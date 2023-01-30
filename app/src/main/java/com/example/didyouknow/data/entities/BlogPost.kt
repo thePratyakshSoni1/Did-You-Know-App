@@ -1,12 +1,11 @@
 package com.example.didyouknow.data.entities
 
-import java.sql.Timestamp
 import java.util.*
 
 data class BlogPost (
-    val Content:String="",
-    val Date: Date = Date(),
-    val Title:String="",
+    val content:String="",
+    val date: Date = Date(),
+    val title:String="",
     val articleId:String="",
     val imageUrl:String="",
     val totalDislikes:Long=0L,

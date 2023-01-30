@@ -56,6 +56,11 @@ class HomeFeedFragment : Fragment() {
 
         }
 
+        binding.addPostButton.setOnClickListener {
+            val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToAddPostFragment()
+            findNavController().navigate(action)
+        }
+
         viewModel.blogPosts.observe(viewLifecycleOwner){
             Toast.makeText(requireContext(),"Updating blogs", Toast.LENGTH_SHORT).show()
             blogsAdapter.blogs = it.data
