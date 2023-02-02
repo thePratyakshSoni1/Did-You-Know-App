@@ -1,10 +1,12 @@
 package com.example.didyouknow.ui.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.didyouknow.data.entities.BlogPost
 import com.example.didyouknow.datasource.FirebaseBlogsDatasource
+import com.example.didyouknow.other.BlogPostEditing
 import com.example.didyouknow.other.Resources
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -14,10 +16,13 @@ import javax.inject.Inject
 @HiltViewModel
 class BlogDetailsViewModel @Inject constructor(
     val blogsDatasource: FirebaseBlogsDatasource
-):ViewModel() {
+):BlogPostEditing() {
 
     private var _blog: MutableLiveData<Resources<BlogPost?>> = MutableLiveData()
     val blog get() = _blog
+
+    private var _isEditingMode:MutableLiveData<Boolean> = MutableLiveData(false)
+    val isEditingMode get() = _isEditingMode as LiveData<Boolean>
 
     private var blogDocId:String? = null
 
@@ -34,6 +39,10 @@ class BlogDetailsViewModel @Inject constructor(
             _blog.postValue( result )
         }
 
+    }
+
+    fun setEditingMode(setToEditingMode:Boolean){
+        _isEditingMode.postValue(setToEditingMode)
     }
 
 

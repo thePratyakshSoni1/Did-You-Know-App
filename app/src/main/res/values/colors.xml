@@ -11,6 +11,7 @@
     <color name="homefeed_background">#E9E9E9</color>
     <color name="post_text">#000000</color>
     <color name="button_icons_tint">#474747</color>
+    <color name="button_tint">#FFFFFF</color>
     <color name="toolbar">#FFFFFF</color>
     <color name="toolbar_text">#000000</color>
     <color name="post_background">#FFFFFF</color>

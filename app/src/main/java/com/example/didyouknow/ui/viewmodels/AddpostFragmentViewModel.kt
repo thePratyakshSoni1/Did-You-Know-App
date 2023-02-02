@@ -7,30 +7,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.didyouknow.data.entities.BlogPost
 import com.example.didyouknow.datasource.FirebaseBlogsDatasource
+import com.example.didyouknow.other.BlogPostEditing
 import com.example.didyouknow.other.Resources
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Calendar
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class AddpostFragmentViewModel @Inject constructor(
     val blogsDatasource: FirebaseBlogsDatasource
-) : ViewModel() {
-
-    private var isvalidImage:Boolean = true
-
-    private var _postTitle: MutableLiveData<String> = MutableLiveData("")
-    val postTitle get() = _postTitle as LiveData<String>
-
-    private var _postContent: MutableLiveData<String> = MutableLiveData("")
-    val postContent get() = _postContent as LiveData<String>
-
-    private var _postImgLink: MutableLiveData<String> = MutableLiveData("")
-    val postimgLink get() = _postImgLink as LiveData<String>
-
-
-
+) : BlogPostEditing() {
 
     private fun isTitleValid():Boolean{
         return if (postTitle.value?.isNotEmpty() == true){
@@ -44,12 +34,6 @@ class AddpostFragmentViewModel @Inject constructor(
         }
     }
 
-    private fun isContentvalid():Boolean{
-        return postTitle.value?.isNotEmpty() == true
-    }
-
-
-    private fun isImgLinkvalid():Boolean = ( postimgLink.value?.isNotEmpty() == true && isvalidImage )
 
     fun postBlog():Resources<Boolean>{
 
@@ -60,8 +44,8 @@ class AddpostFragmentViewModel @Inject constructor(
         var postingBlogStatus: Resources<Boolean> =  Resources.loading(false)
 
         if(isValidBlogPost){
-            viewModelScope.launch {
-                postingBlogStatus= blogsDatasource.postBlog(blogToPost)
+            runBlocking {
+                postingBlogStatus = blogsDatasource.postBlog(blogToPost)
             }
         }else{
             Log.d("AddPostViewModelLogs","Invalid Blog found")
@@ -87,15 +71,5 @@ class AddpostFragmentViewModel @Inject constructor(
     private fun generateBlogDocId():String{
         return postTitle.value!!.replace(" ","-")
     }
-
-    fun setImageValidity(isvalid:Boolean){
-        isvalidImage = isvalid
-    }
-
-    fun updateBlogTitleTxt(newTxt:String)= _postTitle.postValue(newTxt)
-
-    fun updateBlogContentTxt(newTxt:String) = _postContent.postValue(newTxt)
-
-    fun updateBlogImageLinkTxt(newTxt:String) = _postImgLink.postValue(newTxt)
 
 }

@@ -5,6 +5,7 @@
     <color name="homefeed_background">#454545</color>
     <color name="post_text">#FFFFFF</color>
     <color name="button_icons_tint">#5A5A5A</color>
+    <color name="button_tint">#000000</color>
     <color name="toolbar">#1F1F1F</color>
     <color name="toolbar_text">#FFFFFF</color>
     <color name="post_background">#1F1F1F</color>

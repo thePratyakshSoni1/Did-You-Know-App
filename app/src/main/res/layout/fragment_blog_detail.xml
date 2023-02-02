@@ -3,6 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+        <variable
+            name="viewmodel"
+            type="com.example.didyouknow.ui.viewmodels.BlogDetailsViewModel" />
+
+
+    </data>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,7 +21,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/add_post_fragment_background">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -22,10 +33,80 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:navigationIcon="@drawable/ic_back"
                 app:subtitleTextColor="@color/toolbar_text"
-                app:title="Did You Know"
-                app:titleTextColor="@color/toolbar_text" />
+                app:title="Did-You-Know"
+                app:titleTextColor="@color/toolbar_text">
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="16dp">
+
+
+                    <Button
+                        android:id="@+id/toolbarNavButton"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/button_tint"
+                        android:visibility="@{ viewmodel.isEditingMode() ? View.GONE : View.VISIBLE }"
+                        app:cornerRadius="100dp"
+                        app:icon="@drawable/ic_back"
+                        app:iconTint="@color/button_icons_tint"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:rippleColor="#2A474747" />
+
+                    <TextView
+                        android:id="@+id/cancelButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:text="cancel"
+                        android:textColor="#FF3F3F"
+                        android:textSize="16dp"
+                        android:visibility="@{ viewmodel.isEditingMode() ? View.VISIBLE : View.GONE }"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="gone" />
+
+
+                    <TextView
+                        android:id="@+id/updateButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:text="Update"
+                        android:textColor="#0087FF"
+                        android:textSize="16dp"
+                        android:visibility="@{ viewmodel.isEditingMode() ? View.VISIBLE : View.GONE }"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/editPostButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:text="Edit"
+                        android:textColor="#0087FF"
+                        android:textSize="16dp"
+                        android:visibility="@{ viewmodel.isEditingMode() ? View.GONE : View.VISIBLE }"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.Toolbar>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"
@@ -33,6 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:layout_marginTop="8dp"
+                android:foregroundGravity="right"
                 app:cardCornerRadius="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -46,122 +128,170 @@
                     android:visibility="gone"
                     tools:srcCompat="@tools:sample/avatars"
                     tools:visibility="visible" />
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:id="@+id/postTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="16dp"
-                android:textColor="@color/post_text"
-                android:textSize="18dp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView"
-                tools:text="Hello this year MMB gets the oscar award of 2023 !"
-                tools:visibility="visible" />
-
-            <LinearLayout
-                android:id="@+id/blogAnalyticLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/postTitle"
-                app:layout_constraintStart_toStartOf="@+id/postTitle"
-                app:layout_constraintTop_toBottomOf="@+id/postTitle"
-                tools:visibility="visible">
-
 
                 <TextView
                     android:id="@+id/date"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="8dp"
                     android:layout_weight="1"
+                    android:background="@drawable/textfiled_shape"
+                    android:elevation="12dp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"
                     android:text="28 Jan 2023"
-                    android:textAlignment="viewStart"
-                    android:textColor="@color/post_text"/>
+                    android:textColor="@color/post_text" />
+            </androidx.cardview.widget.CardView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <Button
-                            android:id="@+id/postLikeButton"
-                            style="@style/Widget.Material3.Button.Icon"
-                            android:layout_width="54dp"
-                            android:layout_height="64dp"
-                            android:backgroundTint="@color/white"
-                            app:cornerRadius="100dp"
-                            app:icon="@drawable/ic_like"
-                            app:iconTint="@color/button_icons_tint" />
-
-                        <TextView
-                            android:id="@+id/likeCountTxt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:text="10k"
-                            android:textColor="@color/button_icons_tint" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <Button
-                            android:id="@+id/postDislikeButton"
-                            style="@style/Widget.Material3.Button.Icon"
-                            android:layout_width="54dp"
-                            android:layout_height="64dp"
-                            android:backgroundTint="@color/white"
-                            app:cornerRadius="100dp"
-                            app:icon="@drawable/ic_dislike"
-                            app:iconTint="@color/button_icons_tint" />
-
-                        <TextView
-                            android:id="@+id/dislikeCountTxt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:text="10k"
-                            android:textColor="@color/button_icons_tint" />
-                    </LinearLayout>
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/postContent"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="14dp"
-                android:textColor="@color/post_text"
-                android:textSize="16sp"
-                android:visibility="gone"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/blogAnalyticLayout"
-                tools:text="Hello this year MMB gets the oscar award of 2023 !"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+                <EditText
+                    android:id="@+id/postTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/textfiled_shape"
+                    android:clickable="@{viewmodel.isEditingMode()}"
+                    android:cursorVisible="@{viewmodel.isEditingMode()}"
+                    android:focusableInTouchMode="@{viewmodel.isEditingMode()}"
+                    android:focusable="@{viewmodel.isEditingMode().hashCode()}"
+                    android:text="@{viewmodel.blog.data.title}"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp"
+                    android:textColor="@color/post_text"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="Hello this year MMB gets the oscar award of 2023 !"
+                    tools:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/blogAnalyticLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/textfiled_shape"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:visibility="@{ viewmodel.isEditingMode() ? View.VISIBLE : View.GONE }"
+                    tools:visibility="visible">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="8dp"
+                            android:orientation="vertical">
+
+                            <Button
+                                android:id="@+id/postLikeButton"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:backgroundTint="@color/button_tint"
+                                app:cornerRadius="100dp"
+                                app:icon="@drawable/ic_like"
+                                app:iconTint="@color/button_icons_tint"
+                                app:rippleColor="#2A474747" />
+
+                            <TextView
+                                android:id="@+id/likeCountTxt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                android:text="10k"
+                                android:textColor="@color/button_icons_tint" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <Button
+                                android:id="@+id/postDislikeButton"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:backgroundTint="@color/button_tint"
+                                app:cornerRadius="100dp"
+                                app:icon="@drawable/ic_dislike"
+                                app:iconTint="@color/button_icons_tint"
+                                app:rippleColor="#2A474747" />
+
+                            <TextView
+                                android:id="@+id/dislikeCountTxt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                android:text="10k"
+                                android:textColor="@color/button_icons_tint" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/imgLinkTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/textfiled_shape"
+                    android:clickable="@{viewmodel.isEditingMode()}"
+                    android:cursorVisible="@{viewmodel.isEditingMode()}"
+                    android:focusableInTouchMode="@{viewmodel.isEditingMode()}"
+                    android:focusable="@{viewmodel.isEditingMode()}"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp"
+                    android:text="@{viewmodel.blog.data.imageUrl}"
+                    android:textColor="@color/post_text"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:visibility="@{ viewmodel.isEditingMode() ? View.VISIBLE : View.GONE }"
+                    tools:text="Hello this year MMB gets the oscar award of 2023 !"
+                    tools:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/postContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="32dp"
+                    android:background="@drawable/textfiled_shape"
+                    android:clickable="@{viewmodel.isEditingMode()}"
+                    android:cursorVisible="@{viewmodel.isEditingMode()}"
+                    android:focusableInTouchMode="@{viewmodel.isEditingMode()}"
+                    android:focusable="@{viewmodel.isEditingMode()}"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp"
+                    android:text="@{viewmodel.postContent}"
+                    android:textColor="@color/post_text"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    tools:text="Hello this year MMB gets the oscar award of 2023 !"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
 
             <ImageView
                 android:id="@+id/errImageView"
