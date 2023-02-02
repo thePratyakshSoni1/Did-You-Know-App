@@ -4,13 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.load.engine.Resource
 import com.example.didyouknow.data.entities.BlogPost
+import com.example.didyouknow.data.remote.FirebaseDocFieldNames
+import com.example.didyouknow.data.remote.FirebaseDocFields
 import com.example.didyouknow.datasource.FirebaseBlogsDatasource
 import com.example.didyouknow.other.BlogPostEditing
 import com.example.didyouknow.other.Resources
+import com.example.didyouknow.other.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,8 +46,116 @@ class BlogDetailsViewModel @Inject constructor(
 
     }
 
+    fun refreshBlog(){
+        viewModelScope.launch {
+            val result = blogsDatasource.fetchBlogById(blogDocId!!)
+            _blog.postValue( result )
+        }
+    }
+
     fun setEditingMode(setToEditingMode:Boolean){
         _isEditingMode.postValue(setToEditingMode)
+
+        if(!setToEditingMode){
+            blog.value?.data?.let{
+                _postTitle.postValue( it.title )
+                _postContent.postValue( it.content )
+                _postImgLink.postValue( it.imageUrl )
+            }
+        }
+    }
+
+    private fun getInfoAboutFieldsToUpdate():List<FirebaseDocFields>{
+
+        val fieldsToUpdate = mutableListOf<FirebaseDocFields>()
+        blog.value?.data.let {
+
+            if(it?.title != postTitle.value){
+                fieldsToUpdate.add(FirebaseDocFields.TITLE)
+            }
+
+            if(it?.content != postContent.value){
+                fieldsToUpdate.add(FirebaseDocFields.CONTENT)
+            }
+
+            if(it?.imageUrl != postimgLink.value){
+                fieldsToUpdate.add(FirebaseDocFields.IMAGE_URL)
+            }
+
+        }
+
+        return fieldsToUpdate
+    }
+
+    fun updateBlog(): Resources<Boolean>{
+
+        val isBlogValid = isTitleValid() && isContentvalid() && isImgLinkvalid()
+        val fieldsToUpdate = getInfoAboutFieldsToUpdate()
+
+        val blogUpdatestatus:MutableList<Resources<Boolean>> = mutableListOf()
+
+        if(!isBlogValid){
+            return Resources.error(false, "Your Blog isn't valid")
+        }
+
+        if(fieldsToUpdate.isNotEmpty()){
+            runBlocking {
+
+                for(items in fieldsToUpdate){
+
+                    when(items){
+
+                        FirebaseDocFields.TITLE -> {
+                            val stats =  blogsDatasource.updateBlogTitle(postTitle.value!!, blog.value?.data?.articleId!!)
+                            blogUpdatestatus.add(stats)
+                        }
+                        FirebaseDocFields.CONTENT -> {
+                            val stats =  blogsDatasource.updateBlogContent(postContent.value!!, blog.value?.data?.articleId!!)
+                            blogUpdatestatus.add(stats)
+                        }
+
+                        FirebaseDocFields.IMAGE_URL -> {
+                            val stats =  blogsDatasource.updateBlogImage(postimgLink.value!!, blog.value?.data?.articleId!!)
+                            blogUpdatestatus.add(stats)
+                        }
+
+                        else -> Unit
+                    }
+
+                }
+            }
+
+        }else{
+            return Resources.error(false, "Blog Already Updated")
+        }
+
+        return generateUpdateStats(blogUpdatestatus)
+
+    }
+
+    private fun generateUpdateStats(blogUpdatestatus:List<Resources<Boolean>>):Resources<Boolean>{
+
+        var returnMsg = ""
+        var allFieldsAreUpdated = true
+
+        for(items in blogUpdatestatus){
+            if(items.status != Status.SUCCESS){
+                allFieldsAreUpdated = false
+                break
+            }
+        }
+
+        if( !allFieldsAreUpdated ){
+
+            blogUpdatestatus.forEach {
+                if(it.status == Status.ERROR){
+                    returnMsg += "${it.message}\n"
+                }
+            }
+
+        }
+
+        return if(allFieldsAreUpdated) Resources.success(true) else Resources.error(false, returnMsg)
     }
 
 

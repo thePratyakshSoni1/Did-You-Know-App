@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -65,6 +66,26 @@ class BlogDetailFragment : Fragment() {
 
         binding.editPostButton.setOnClickListener {
             viewModel.setEditingMode(true)
+        }
+
+        binding.updateButton.setOnClickListener {
+
+            val result = viewModel.updateBlog()
+            var toast:String
+            viewModel.setEditingMode(false)
+            if (result.status == Status.SUCCESS){
+                toast = "Blog Successfully updated"
+                viewModel.refreshBlog()
+            }
+            else {
+                toast = result.message!!
+            }
+            Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT ).show()
+
+        }
+
+        binding.cancelButton.setOnClickListener {
+            viewModel.setEditingMode(false)
         }
 
     }

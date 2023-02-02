@@ -24,24 +24,38 @@ abstract class BlogPostEditing: ViewModel() {
     val postimgLink get() = _postImgLink as LiveData<String>
 
     protected fun isContentvalid():Boolean{
-        return postTitle.value?.isNotEmpty() == true
+        return if(postContent.value?.isNotEmpty() == true){
+            Log.d("BlogPostEditingLogs","Invalid Content")
+            true
+        }else{
+            false
+        }
     }
 
-    protected fun isImgLinkvalid():Boolean = ( postimgLink.value?.isNotEmpty() == true && isvalidImage )
+    protected fun isImgLinkvalid():Boolean {
+        return if(postimgLink.value?.isNotEmpty() == true && isvalidImage){
+            Log.d("BlogPostEditingLogs","Invalid Image Link")
+            true
+        }else{
+            false
+        }
+    }
 
 
-//    protected fun prepareBlogPost( docId:String ): BlogPost {
-//        return BlogPost(
-//            content = postContent.value!!,
-//            date = Calendar.getInstance().time,
-//            title= postTitle.value!!,
-//            articleId = docId,
-//            imageUrl = postimgLink.value!!,
-//
-//            )
-//
-//
-//    }
+
+    protected fun isTitleValid():Boolean{
+        return if (postTitle.value?.isNotEmpty() == true){
+            if(postTitle.value!![0] == ' '){
+                _postTitle.postValue(postTitle.value!!.removePrefix(" "))
+                isTitleValid()
+            }
+            true
+        }else{
+            Log.d("BlogPostEditingLogs","Invalid Title")
+            false
+        }
+    }
+
 
     fun setImageValidity(isvalid:Boolean){
         isvalidImage = isvalid

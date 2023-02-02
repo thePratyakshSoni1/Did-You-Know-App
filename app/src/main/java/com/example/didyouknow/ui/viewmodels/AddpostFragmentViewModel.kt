@@ -22,18 +22,6 @@ class AddpostFragmentViewModel @Inject constructor(
     val blogsDatasource: FirebaseBlogsDatasource
 ) : BlogPostEditing() {
 
-    private fun isTitleValid():Boolean{
-        return if (postTitle.value?.isNotEmpty() == true){
-            if(postTitle.value!![0] == ' '){
-                _postTitle.postValue(postTitle.value!!.removePrefix(" "))
-                isTitleValid()
-            }
-            true
-        }else{
-            false
-        }
-    }
-
 
     fun postBlog():Resources<Boolean>{
 

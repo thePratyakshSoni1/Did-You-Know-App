@@ -36,12 +36,61 @@ class BlogsDatabase {
 
     suspend fun postBlog( blog:BlogPost ):Resources<Boolean>{
 
-        val x = fbCollection.document(blog.articleId).set(blog)
-        x.await()
-        return if(x.isSuccessful){
+        val task = fbCollection.document(blog.articleId).set(blog)
+        task.await()
+        return if(task.isSuccessful){
             Resources.success(true)
         }else{
-            Resources.error(false, "${x.exception?.message}\n${x.exception?.stackTrace}")
+            Resources.error(false, "${task.exception?.message}\n${task.exception?.stackTrace}")
+        }
+
+    }
+
+    suspend fun updateBlogTitle( newTitle:String, articleId:String ):Resources<Boolean>{
+
+        val docRef = fbCollection.document(articleId)
+        val task = docRef.update(
+            FirebaseDocFieldNames.BlogTitleField, newTitle
+        )
+
+        task.await()
+        return if(task.isSuccessful){
+            Resources.success(true)
+        }else{
+            Log.d("BlogFbDatabaseLogs", "${task.exception?.message}\n${task.exception?.stackTrace}")
+            Resources.error(false, "Title not updated")
+        }
+
+    }
+    suspend fun updateBlogContent( newContent:String, articleId:String ):Resources<Boolean>{
+
+        val docRef = fbCollection.document(articleId)
+        val task = docRef.update(
+            FirebaseDocFieldNames.BlogContentField, newContent
+        )
+
+        task.await()
+        return if(task.isSuccessful){
+            Resources.success(true)
+        }else{
+            Log.d("BlogFbDatabaseLogs", "${task.exception?.message}\n${task.exception?.stackTrace}")
+            Resources.error(false, "Content not updated")
+        }
+
+    }
+    suspend fun updateBlogImage( newImgLink:String, articleId:String ):Resources<Boolean>{
+
+        val docRef = fbCollection.document(articleId)
+        val task = docRef.update(
+            FirebaseDocFieldNames.BlogImageLinkField, newImgLink
+        )
+
+        task.await()
+        return if(task.isSuccessful){
+            Resources.success(true)
+        }else{
+            Log.d("BlogFbDatabaseLogs", "${task.exception?.message}\n${task.exception?.stackTrace}")
+            Resources.error(false, "Image not updated")
         }
 
     }
