@@ -12,6 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
@@ -20,6 +21,8 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.didyouknow.R
 import com.example.didyouknow.databinding.FragmentAddPostBinding
+import com.example.didyouknow.other.DialogHandlers
+import com.example.didyouknow.other.Resources
 import com.example.didyouknow.other.Status
 import com.example.didyouknow.ui.viewmodels.AddpostFragmentViewModel
 import com.google.protobuf.DescriptorProtos.EnumDescriptorProto.EnumReservedRangeOrBuilder
@@ -61,11 +64,35 @@ class AddPostFragment : Fragment() {
         binding.postButton.setOnClickListener {
             Toast.makeText(requireContext(), "Posting Blog", Toast.LENGTH_SHORT).show()
             val status = viewModel.postBlog()
+
+            val postingStats = MutableLiveData<Resources<Boolean>>()
+            postingStats.postValue(Resources.loading(false))
+
+            DialogHandlers(requireContext()).showProgressDialog(
+                viewLifecycleOwner,
+                postingStats,
+                onDoneClick = { findNavController().popBackStack() },
+                dialogErrorTxt = "Can't Post Blog",
+                dialogLoadingTxt = "Posting Blog...",
+                dialogSuccessTxt = "Blog Posted Successfully"
+            )
+
             val toastMsg = when(status.status){
 
-                Status.ERROR -> status.message
-                Status.LOADING -> "Posting Blog :)"
-                Status.SUCCESS ->  "Blog Posted Successfully"
+                Status.ERROR -> {
+                    postingStats.postValue(Resources.error(false, null))
+                    status.message
+                }
+                Status.LOADING -> {
+
+                    postingStats.postValue(Resources.loading(false))
+                    "Posting Blog :)"
+                }
+                Status.SUCCESS -> {
+
+                    postingStats.postValue(Resources.success(true))
+                    "Blog Posted Successfully"
+                }
 
             }
             Toast.makeText(requireContext(), toastMsg, Toast.LENGTH_LONG).show()

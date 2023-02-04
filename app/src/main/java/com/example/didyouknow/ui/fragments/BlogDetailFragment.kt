@@ -17,6 +17,8 @@ import com.bumptech.glide.RequestManager
 import com.example.didyouknow.R
 import com.example.didyouknow.databinding.FragmentBlogDetailBinding
 import com.example.didyouknow.other.BlogPostEditing
+import com.example.didyouknow.other.DialogHandlers
+import com.example.didyouknow.other.Resources
 import com.example.didyouknow.other.Status
 import com.example.didyouknow.ui.viewmodels.BlogDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +50,7 @@ class BlogDetailFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_blog_detail, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
+
         return binding.root
     }
 
@@ -55,10 +58,19 @@ class BlogDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.viewmodel = viewModel
+        setListeners()
         setObservers()
         setTextUpdaters()
 
         viewModel.initializeViewModel(arguments?.getString("blogDocId")!!)
+
+
+    }
+
+    private fun setListeners(){
+        binding.imgLinkTextView.addTextChangedListener {
+            viewModel.updateBlogImageLinkTxt(it.toString())
+        }
 
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -68,17 +80,38 @@ class BlogDetailFragment : Fragment() {
             viewModel.setEditingMode(true)
         }
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshBlog{
+                binding.swipeRefreshLayout.isRefreshing = false
+            }
+
+        }
+
         binding.updateButton.setOnClickListener {
 
             val result = viewModel.updateBlog()
+
+            val blogUpdateStatus = MutableLiveData<Resources<Boolean>>()
+            blogUpdateStatus.postValue(Resources.loading(false))
+
+            DialogHandlers(requireContext()).showProgressDialog(
+                viewLifecycleOwner,
+                blogUpdateStatus,
+                onDoneClick = { findNavController().popBackStack() },
+                dialogErrorTxt = "Can't Post Blog",
+                dialogLoadingTxt = "Posting Blog...",
+                dialogSuccessTxt = "Blog Posted Successfully"
+            )
+
             var toast:String
             viewModel.setEditingMode(false)
             if (result.status == Status.SUCCESS){
                 toast = "Blog Successfully updated"
-                viewModel.refreshBlog()
+                blogUpdateStatus.postValue(Resources.success(true))
             }
             else {
                 toast = result.message!!
+                blogUpdateStatus.postValue(Resources.error(false, "Can't post blog !"))
             }
             Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT ).show()
 
@@ -87,7 +120,6 @@ class BlogDetailFragment : Fragment() {
         binding.cancelButton.setOnClickListener {
             viewModel.setEditingMode(false)
         }
-
     }
 
     private fun setTextUpdaters(){
@@ -137,6 +169,10 @@ class BlogDetailFragment : Fragment() {
 
             }
 
+        }
+
+        viewModel.postimgLink.observe(viewLifecycleOwner){
+            glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
         }
 
     }

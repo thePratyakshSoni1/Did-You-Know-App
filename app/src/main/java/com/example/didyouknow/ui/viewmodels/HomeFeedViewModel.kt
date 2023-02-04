@@ -34,6 +34,15 @@ class HomeFeedViewModel @Inject constructor (
 
     }
 
+
+    fun refreshBlogs(onSuccessRefresh:()->Unit){
+        viewModelScope.launch {
+            val result = blogsDataSource.fetchAllBlogs()
+            blogPosts.postValue( result )
+            onSuccessRefresh()
+        }
+    }
+
     private suspend fun fetchAndSyncBlogs() {
 
         Log.d("HomeFeedViewModelLogs", "Syncing blogs")

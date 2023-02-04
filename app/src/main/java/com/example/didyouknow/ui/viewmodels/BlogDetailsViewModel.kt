@@ -46,12 +46,14 @@ class BlogDetailsViewModel @Inject constructor(
 
     }
 
-    fun refreshBlog(){
+    fun refreshBlog(onSuccessRefresh:()->Unit){
         viewModelScope.launch {
             val result = blogsDatasource.fetchBlogById(blogDocId!!)
             _blog.postValue( result )
+            onSuccessRefresh()
         }
     }
+
 
     fun setEditingMode(setToEditingMode:Boolean){
         _isEditingMode.postValue(setToEditingMode)
