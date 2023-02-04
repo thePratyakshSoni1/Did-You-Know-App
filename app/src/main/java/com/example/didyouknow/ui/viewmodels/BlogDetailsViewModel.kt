@@ -29,28 +29,39 @@ class BlogDetailsViewModel @Inject constructor(
     private var _isEditingMode:MutableLiveData<Boolean> = MutableLiveData(false)
     val isEditingMode get() = _isEditingMode as LiveData<Boolean>
 
+    private var _isRefreshing:MutableLiveData<Boolean> = MutableLiveData(false)
+    val isRefreshing get() = _isRefreshing as LiveData<Boolean>
+
     private var blogDocId:String? = null
 
     init {
         _blog.postValue(Resources.loading( null ))
     }
 
-    fun initializeViewModel(blogId:String){
+    fun initializeViewModel(
+        blogId:String,
+        openForEditMode:Boolean
+    ){
 
         blogDocId = blogId
         viewModelScope.launch {
+            _isRefreshing.postValue(true)
             val result = blogsDatasource.fetchBlogById(blogId)
             delay(3000 )
             _blog.postValue( result )
+            if(openForEditMode) _isEditingMode.postValue(true)
+            _isRefreshing.postValue(false)
+
         }
 
     }
 
-    fun refreshBlog(onSuccessRefresh:()->Unit){
+    fun refreshBlog(){
+        _isRefreshing.postValue(true)
         viewModelScope.launch {
             val result = blogsDatasource.fetchBlogById(blogDocId!!)
             _blog.postValue( result )
-            onSuccessRefresh()
+            _isRefreshing.postValue(false)
         }
     }
 

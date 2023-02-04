@@ -46,6 +46,18 @@ class BlogsDatabase {
 
     }
 
+    suspend fun deleteBlogDoc( blogDocId:String ):Resources<Boolean>{
+
+        val task = fbCollection.document(blogDocId).delete()
+        task.await()
+        return if(task.isSuccessful){
+            Resources.success(true)
+        }else{
+            Resources.error(false, "${task.exception?.message}\n${task.exception?.stackTrace}")
+        }
+
+    }
+
     suspend fun updateBlogTitle( newTitle:String, articleId:String ):Resources<Boolean>{
 
         val docRef = fbCollection.document(articleId)

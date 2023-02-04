@@ -15,13 +15,22 @@
     <fragment
         android:id="@+id/blogDetailFragment"
         android:name="com.example.didyouknow.ui.fragments.BlogDetailFragment"
-        android:label="BlogDetailFragment" >
+        android:label="BlogDetailFragment">
+
         <action
             android:id="@+id/action_blogDetailFragment_to_homeFeedFragment"
             app:destination="@id/homeFeedFragment" />
         <argument
             android:name="blogDocId"
             app:argType="string" />
+        <argument
+            android:name="openBlogForEditMode"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="https://didyouknowthat.onrender.com/article/{blogDocId}" />
+
     </fragment>
     <fragment
         android:id="@+id/homeFeedFragment"

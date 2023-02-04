@@ -11,6 +11,7 @@ import com.example.didyouknow.other.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,8 +31,6 @@ class HomeFeedViewModel @Inject constructor (
             fetchAndSyncBlogs()
         }
 
-
-
     }
 
 
@@ -49,6 +48,17 @@ class HomeFeedViewModel @Inject constructor (
         var results = blogsDataSource.fetchAllBlogs()
         blogPosts.postValue(results)
         Log.d("HomeFeedViewModelLogs", "Bloogs fetched")
+
+    }
+
+    fun deleteBlog(blogId:String):Resources<Boolean>{
+
+        val status:Resources<Boolean>
+        runBlocking {
+            status = blogsDataSource.deleteBlogDoc( blogId )
+        }
+        return status
+
 
     }
 

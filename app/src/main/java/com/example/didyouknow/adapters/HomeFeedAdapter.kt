@@ -1,7 +1,9 @@
 package com.example.didyouknow.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -12,8 +14,9 @@ import com.example.didyouknow.data.entities.BlogPost
 import com.example.didyouknow.databinding.BlogpostLayoutBinding
 import javax.inject.Inject
 
-class HomeFeedAdapter @Inject constructor(
-    val glide:RequestManager
+class HomeFeedAdapter (
+    val glide:RequestManager,
+    val context:Context
 ):RecyclerView.Adapter<HomeFeedAdapter.HomeFeedAdapterViewholder>() {
 
     inner class HomeFeedAdapterViewholder(val binding: BlogpostLayoutBinding): RecyclerView.ViewHolder(binding.root)
@@ -59,17 +62,69 @@ class HomeFeedAdapter @Inject constructor(
             }
         }
 
+        holder.binding.postOptions.setOnClickListener{
+
+            val popUpMenu = PopupMenu(context, it).apply {
+                inflate(R.menu.blogpost_menu)
+                setOnMenuItemClickListener {
+
+                    when(it.itemId){
+
+                        R.id.postEditMenuItem -> {
+                            onEditListener?.let {click ->
+                                click(blogs[position].articleId)
+                            }
+                            true
+                        }
+
+                        R.id.postShareMenuItem -> {
+                            onShareListener?.let {click ->
+                                click(blogs[position].articleId)
+                            }
+                            true
+                        }
+
+                        R.id.postDeleteMenuItem -> {
+                            onDeleteListener?.let {click ->
+                                click(blogs[position].articleId)
+                            }
+                            true
+                        }
+
+                        else -> false
+                    }
+
+                }
+
+                show()
+            }
+
+        }
+
 
 
     }
 
     private var clickListener:((blogDocId:String)->Unit)? = null
+    private var onShareListener:((blogDocId:String)->Unit)? = null
+    private var onEditListener:((blogDocId:String)->Unit)? = null
+    private var onDeleteListener:((blogDocId:String)->Unit)? = null
 
     override fun getItemCount(): Int {
         return blogs.size
     }
 
-    fun setClickListener( listener:(blogDocId:String)->Unit ){
-        clickListener = listener
+    fun setClickListeners(
+        postClickListener:(blogDocId:String)->Unit,
+        onShareMenuClick:( blogDocId:String ) -> Unit,
+        onDeleteMenuClick:( blogDocId:String ) -> Unit,
+        onEditMenuClick:( blogDocId:String ) -> Unit
+
+    ){
+        clickListener = postClickListener
+
+        onShareListener = onShareMenuClick
+        onEditListener = onEditMenuClick
+        onDeleteListener = onDeleteMenuClick
     }
 }

@@ -30,6 +30,7 @@ class FirebaseBlogsDatasource @Inject constructor(
 
     }
 
+    suspend fun deleteBlogDoc( blogDocId:String ):Resources<Boolean> = blogsDatabse.deleteBlogDoc( blogDocId )
     suspend fun postBlog( blog:BlogPost ):Resources<Boolean> = blogsDatabse.postBlog(blog)
 
     suspend fun updateBlogTitle( newTitle:String, articleId:String ): Resources<Boolean> = blogsDatabse.updateBlogTitle(newTitle, articleId)

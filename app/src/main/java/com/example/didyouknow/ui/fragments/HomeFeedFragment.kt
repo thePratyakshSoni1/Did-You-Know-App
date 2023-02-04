@@ -2,6 +2,7 @@ package com.example.didyouknow.ui.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +18,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +26,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.didyouknow.R
 import com.example.didyouknow.adapters.HomeFeedAdapter
 import com.example.didyouknow.databinding.FragmentHomeFeedBinding
+import com.example.didyouknow.other.DialogHandlers
 import com.example.didyouknow.other.Resources
 import com.example.didyouknow.other.Status
 import com.example.didyouknow.ui.viewmodels.HomeFeedViewModel
@@ -63,18 +66,48 @@ class HomeFeedFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = blogsAdapter
 
+        refreshBlogs()
+
         binding.refreshLayout.setOnRefreshListener{
             viewModel.refreshBlogs{
                 binding.refreshLayout.isRefreshing = false
             }
         }
 
-        blogsAdapter.setClickListener {
+        blogsAdapter.setClickListeners(
+            postClickListener = {
+                val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it)
+                findNavController().navigate(action)
+            },
+            onShareMenuClick = {blogDocId ->
+                val actionInten = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, "https://didyouknowthat.onrender.com/article/${blogDocId}")
+                    type = "text/plain"
+                }
 
-            val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it)
-            findNavController().navigate(action)
-
-        }
+                val shareIntent = Intent.createChooser(actionInten, "Did You Know ?")
+                startActivity(shareIntent)
+            },
+            onEditMenuClick = {
+                val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it, true)
+                findNavController().navigate(action)
+            },
+            onDeleteMenuClick = { blogDocId ->
+                val deletionStatus = MutableLiveData<Resources<Boolean>>()
+                DialogHandlers(requireContext()).showProgressDialog(
+                    viewLifecycleOwner,
+                    deletionStatus,
+                    onDoneClick = {
+                        refreshBlogs()
+                    },
+                    dialogSuccessTxt = "Blog Deleted",
+                    dialogLoadingTxt = "Deleting your blog",
+                    dialogErrorTxt = "Error while deleting !"
+                )
+                deletionStatus.postValue(viewModel.deleteBlog(blogDocId))
+            }
+        )
 
         binding.addPostButton.setOnClickListener {
             val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToAddPostFragment()
@@ -91,7 +124,6 @@ class HomeFeedFragment : Fragment() {
     }
 
     private fun refreshBlogs(){
-
         binding.refreshLayout.isRefreshing = true
         viewModel.refreshBlogs {
             binding.refreshLayout.isRefreshing = false

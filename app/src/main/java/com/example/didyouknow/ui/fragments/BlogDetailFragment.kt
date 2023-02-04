@@ -16,10 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.didyouknow.R
 import com.example.didyouknow.databinding.FragmentBlogDetailBinding
-import com.example.didyouknow.other.BlogPostEditing
-import com.example.didyouknow.other.DialogHandlers
-import com.example.didyouknow.other.Resources
-import com.example.didyouknow.other.Status
+import com.example.didyouknow.other.*
 import com.example.didyouknow.ui.viewmodels.BlogDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
@@ -62,7 +59,10 @@ class BlogDetailFragment : Fragment() {
         setObservers()
         setTextUpdaters()
 
-        viewModel.initializeViewModel(arguments?.getString("blogDocId")!!)
+        viewModel.initializeViewModel(
+            blogId = arguments?.getString(NavigationKeys.KEY_BLOG_DOC_ID)!!,
+            openForEditMode = arguments?.getBoolean(NavigationKeys.KEY_OPEN_BLOG_FOR_EDIT_MODE)!!
+        )
 
 
     }
@@ -72,7 +72,7 @@ class BlogDetailFragment : Fragment() {
             viewModel.updateBlogImageLinkTxt(it.toString())
         }
 
-        binding.toolbar.setNavigationOnClickListener {
+        binding.toolbarNavButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
@@ -81,15 +81,12 @@ class BlogDetailFragment : Fragment() {
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshBlog{
-                binding.swipeRefreshLayout.isRefreshing = false
-            }
+            viewModel.refreshBlog()
 
         }
 
         binding.updateButton.setOnClickListener {
 
-            val result = viewModel.updateBlog()
 
             val blogUpdateStatus = MutableLiveData<Resources<Boolean>>()
             blogUpdateStatus.postValue(Resources.loading(false))
@@ -102,6 +99,8 @@ class BlogDetailFragment : Fragment() {
                 dialogLoadingTxt = "Posting Blog...",
                 dialogSuccessTxt = "Blog Posted Successfully"
             )
+
+            val result = viewModel.updateBlog()
 
             var toast:String
             viewModel.setEditingMode(false)
@@ -175,6 +174,10 @@ class BlogDetailFragment : Fragment() {
             glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
         }
 
+        viewModel.isRefreshing.observe(viewLifecycleOwner){
+            binding.swipeRefreshLayout.isRefreshing = it
+        }
+
     }
 
     private fun toggleBlogVisibility(
@@ -191,7 +194,6 @@ class BlogDetailFragment : Fragment() {
             blogAnalyticLayout.visibility = if(setBlogToVisible) View.VISIBLE else View.GONE
             date.visibility = if(setBlogToVisible) View.VISIBLE else View.GONE
             errImageView.visibility = if(setError) View.VISIBLE else View.GONE
-            progressBar.visibility = if(setloading) View.VISIBLE else View.GONE
 
         }
 

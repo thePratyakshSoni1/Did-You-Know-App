@@ -3,6 +3,7 @@ package com.example.didyouknow.other
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -28,6 +29,7 @@ class DialogHandlers( val context:Context ) {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
             findViewById<Button>(R.id.dialogCancelButton).setOnClickListener {
                 dismiss()
@@ -75,7 +77,7 @@ class DialogHandlers( val context:Context ) {
                         dialogProgressBar.visibility = View.VISIBLE
                         dialogImg.visibility = View.INVISIBLE
                         dialogImg.setImageResource(R.drawable.ic_error_round)
-                        actionBtn.visibility = View.VISIBLE
+                        actionBtn.visibility = View.GONE
                     }
 
 
@@ -106,6 +108,8 @@ class DialogHandlers( val context:Context ) {
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
 
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
             findViewById<Button>(R.id.dialogCancelButton).setOnClickListener {
                 dismiss()
             }
@@ -131,7 +135,7 @@ class DialogHandlers( val context:Context ) {
             findViewById<TextView>(R.id.dialogText).setText(
                 diaogText
             )
-
+            show()
 
         }
 

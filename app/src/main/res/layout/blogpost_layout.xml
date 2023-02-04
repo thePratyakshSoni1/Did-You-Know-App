@@ -20,13 +20,29 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
 
+        <Button
+            android:id="@+id/postOptions"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/post_background"
+            android:elevation="2dp"
+            app:cornerRadius="100dp"
+            app:icon="@drawable/ic_options"
+            app:iconTint="@color/button_icons_tint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/postThumbnail"
+            app:rippleColor="#2A474747" />
+
         <TextView
             android:id="@+id/postTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="14dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:maxLines="3"
             android:textColor="@color/post_text"
             android:textSize="18dp"
@@ -34,22 +50,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/postThumbnail"
-            tools:text="Hello this year MMB gets the oscar award of 2023 !" />
+            tools:text="Hello this year MMB gets the oscar award of 2023" />
 
         <TextView
             android:id="@+id/postContent"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="14dp"
             android:maxLines="4"
             android:textColor="@color/post_text"
             android:textSize="14dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/postTitle"
+            app:layout_constraintStart_toStartOf="@+id/postTitle"
             app:layout_constraintTop_toBottomOf="@+id/postTitle"
-            tools:text="Hello this year MMB gets the oscar award of 2023 !" />
+            tools:text="Hello this year MMB gets the oscar award of 2023  and many more exciting announcemets here !" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

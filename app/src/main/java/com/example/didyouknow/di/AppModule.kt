@@ -5,6 +5,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.example.didyouknow.R
+import com.example.didyouknow.adapters.HomeFeedAdapter
 import com.example.didyouknow.data.remote.BlogsDatabase
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,17 @@ object AppModule {
     @Provides
     @Singleton
     fun provideBogDatabase() = BlogsDatabase()
+
+    @Provides
+    @Singleton
+    fun provideHomeFeedAdapter(
+        glide:RequestManager,
+        @ApplicationContext
+        context:Context
+    ):HomeFeedAdapter = HomeFeedAdapter(
+        glide,
+        context
+    )
 
 
 }

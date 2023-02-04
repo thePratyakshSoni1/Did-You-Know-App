@@ -63,11 +63,9 @@ class AddPostFragment : Fragment() {
 
         binding.postButton.setOnClickListener {
             Toast.makeText(requireContext(), "Posting Blog", Toast.LENGTH_SHORT).show()
-            val status = viewModel.postBlog()
 
             val postingStats = MutableLiveData<Resources<Boolean>>()
             postingStats.postValue(Resources.loading(false))
-
             DialogHandlers(requireContext()).showProgressDialog(
                 viewLifecycleOwner,
                 postingStats,
@@ -77,26 +75,8 @@ class AddPostFragment : Fragment() {
                 dialogSuccessTxt = "Blog Posted Successfully"
             )
 
-            val toastMsg = when(status.status){
+            postingStats.postValue(viewModel.postBlog())
 
-                Status.ERROR -> {
-                    postingStats.postValue(Resources.error(false, null))
-                    status.message
-                }
-                Status.LOADING -> {
-
-                    postingStats.postValue(Resources.loading(false))
-                    "Posting Blog :)"
-                }
-                Status.SUCCESS -> {
-
-                    postingStats.postValue(Resources.success(true))
-                    "Blog Posted Successfully"
-                }
-
-            }
-            Toast.makeText(requireContext(), toastMsg, Toast.LENGTH_LONG).show()
-            if(status.status == Status.SUCCESS) findNavController().popBackStack()
         }
 
         binding.cancelButton.setOnClickListener {
