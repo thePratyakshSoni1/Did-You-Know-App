@@ -238,7 +238,8 @@
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical">
+                                    android:orientation="vertical"
+                                    android:layout_marginEnd="8dp">
 
                                     <Button
                                         android:id="@+id/postDislikeButton"
@@ -260,6 +261,33 @@
                                         android:text="10k"
                                         android:textColor="@color/button_icons_tint" />
                                 </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <Button
+                                        android:id="@+id/postShareButton"
+                                        style="@style/Widget.Material3.Button.IconButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:backgroundTint="@color/button_tint"
+                                        app:cornerRadius="100dp"
+                                        app:icon="@drawable/ic_share"
+                                        app:iconTint="@color/button_icons_tint"
+                                        app:rippleColor="#2A474747" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:layout_weight="1"
+                                        android:text="Share"
+                                        android:textColor="@color/button_icons_tint" />
+                                </LinearLayout>
+
+
                             </LinearLayout>
 
                         </LinearLayout>

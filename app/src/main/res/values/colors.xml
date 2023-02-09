@@ -21,4 +21,9 @@
     <color name="add_post_text">#000000</color>
     <color name="add_post_fragment_background">#FFFFFF</color>
 
+    <color name="button_color_red">#FF2424</color>
+    <color name="button_color_green">#4CAF50</color>
+
+
+
 </resources>

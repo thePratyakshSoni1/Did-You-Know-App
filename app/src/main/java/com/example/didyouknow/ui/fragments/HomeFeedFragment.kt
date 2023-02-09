@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,6 +44,7 @@ class HomeFeedFragment : Fragment() {
     val binding: FragmentHomeFeedBinding get() = _binding!!
 
     private val viewModel: HomeFeedViewModel by viewModels()
+    private lateinit var dialogHandlers:DialogHandlers
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,52 +64,19 @@ class HomeFeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        dialogHandlers = DialogHandlers(requireContext())
         Toast.makeText(requireContext(),"You Are in HomeFrag", Toast.LENGTH_SHORT).show()
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = blogsAdapter
 
         refreshBlogs()
+        addListenerstoAdapter()
 
         binding.refreshLayout.setOnRefreshListener{
             viewModel.refreshBlogs{
                 binding.refreshLayout.isRefreshing = false
             }
         }
-
-        blogsAdapter.setClickListeners(
-            postClickListener = {
-                val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it)
-                findNavController().navigate(action)
-            },
-            onShareMenuClick = {blogDocId ->
-                val actionInten = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "https://didyouknowthat.onrender.com/article/${blogDocId}")
-                    type = "text/plain"
-                }
-
-                val shareIntent = Intent.createChooser(actionInten, "Did You Know ?")
-                startActivity(shareIntent)
-            },
-            onEditMenuClick = {
-                val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it, true)
-                findNavController().navigate(action)
-            },
-            onDeleteMenuClick = { blogDocId ->
-                val deletionStatus = MutableLiveData<Resources<Boolean>>()
-                DialogHandlers(requireContext()).showProgressDialog(
-                    viewLifecycleOwner,
-                    deletionStatus,
-                    onDoneClick = {
-                        refreshBlogs()
-                    },
-                    dialogSuccessTxt = "Blog Deleted",
-                    dialogLoadingTxt = "Deleting your blog",
-                    dialogErrorTxt = "Error while deleting !"
-                )
-                deletionStatus.postValue(viewModel.deleteBlog(blogDocId))
-            }
-        )
 
         binding.addPostButton.setOnClickListener {
             val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToAddPostFragment()
@@ -130,6 +99,59 @@ class HomeFeedFragment : Fragment() {
         }
     }
 
+    private fun addListenerstoAdapter(){
+
+        blogsAdapter.setClickListeners(
+            postClickListener = {
+                val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it)
+                findNavController().navigate(action)
+            },
+            onShareMenuClick = { blogDocId ->
+                val actionInten = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, "https://didyouknowthat.onrender.com/article/${blogDocId}")
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(actionInten, "Did You Know ?")
+                startActivity(shareIntent)
+            },
+            onEditMenuClick = {
+                val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it, true)
+                findNavController().navigate(action)
+            },
+            onDeleteMenuClick = { blogDocId ->
+
+                val blogTitle = blogsAdapter.blogs.find {
+                    it.articleId == blogDocId
+                }?.title
+
+                dialogHandlers.showWarningDialog(
+
+                    "Delete blog: \n${blogTitle} ?",
+                    "Delete",
+                    negativeButtonTxt = "Cancel",
+                    onPositiveButtonClick = {
+                        val deletionStatus = MutableLiveData<Resources<Boolean>>()
+                        dialogHandlers.showProgressDialog(
+                            viewLifecycleOwner,
+                            deletionStatus,
+                            onDoneClick = {
+                                refreshBlogs()
+                            },
+                            dialogSuccessTxt = "Blog Deleted",
+                            dialogLoadingTxt = "Deleting your blog",
+                            dialogErrorTxt = "Error while deleting !"
+                        )
+                        deletionStatus.postValue(viewModel.deleteBlog(blogDocId))
+                    },
+                    onNegativeButtonClick = {
+                        Unit
+                    },
+                    dialogImgRes = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_delete)!!
+                )
+            }
+        ) }
 
 
 }

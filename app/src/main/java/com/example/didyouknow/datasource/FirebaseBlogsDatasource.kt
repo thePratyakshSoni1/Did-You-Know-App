@@ -12,7 +12,10 @@ class FirebaseBlogsDatasource @Inject constructor(
 
     suspend  fun fetchAllBlogs(): Resources<List<BlogPost>> {
 
-        val blogs = blogsDatabse.getAllBlogs()
+        val blogs = blogsDatabse.getAllBlogs().sortedByDescending {
+            it.date
+        }
+
         return if(blogs.isNotEmpty()){
             Log.d("FirebaseSourceLogs","Success Fetching: ${blogs}")
             Resources.success(blogs)
@@ -24,8 +27,8 @@ class FirebaseBlogsDatasource @Inject constructor(
 
     suspend fun fetchBlogById(blogId:String):Resources<BlogPost?>{
 
-        val requiredBlogPost:BlogPost = blogsDatabse.getBlogById(blogId)!!
-         Log.d("FirebaseSourceLogs","Success Fetching: ${requiredBlogPost.title}")
+        val requiredBlogPost:BlogPost? = blogsDatabse.getBlogById(blogId)
+         Log.d("FirebaseSourceLogs","Success Fetching: ${requiredBlogPost?.title}")
         return Resources.success(requiredBlogPost)
 
     }

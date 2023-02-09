@@ -1,6 +1,7 @@
 package com.example.didyouknow.ui.fragments
 
 import android.content.UriMatcher
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -39,6 +41,7 @@ class AddPostFragment : Fragment() {
     val binding get() = _binding!!
 
     private val viewModel:AddpostFragmentViewModel by viewModels()
+    lateinit private var dialoghandler:DialogHandlers
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,12 +59,23 @@ class AddPostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        dialoghandler = DialogHandlers(requireContext())
         binding.viewmodel = viewModel
         setObservers()
         setTextUpdaters()
+        setPostButtonClickListener()
 
-        binding.postButton.setOnClickListener {
+
+
+        binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+    }
+
+    private fun setPostButtonClickListener(){
+
+        val onPost = {
             Toast.makeText(requireContext(), "Posting Blog", Toast.LENGTH_SHORT).show()
 
             val postingStats = MutableLiveData<Resources<Boolean>>()
@@ -79,10 +93,22 @@ class AddPostFragment : Fragment() {
 
         }
 
-        binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
+        binding.postButton.setOnClickListener {
 
+            dialoghandler.showWarningDialog(
+                diaogText = "Do you want to post this blog?:\n${viewModel.postTitle.value}",
+                positiveButtonTxt = "Post",
+                onPositiveButtonClick = {
+                    onPost()
+                },
+                onNegativeButtonClick = {
+                    findNavController().popBackStack()
+                },
+                dialogImgRes = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_placeholder)!!,
+                buttonColorResId = R.color.button_color_green
+            )
+
+        }
     }
 
     private fun setObservers(){

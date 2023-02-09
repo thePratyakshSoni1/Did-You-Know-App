@@ -2,18 +2,22 @@ package com.example.didyouknow.other
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.example.didyouknow.R
+import com.google.android.material.button.MaterialButton
 
 class DialogHandlers( val context:Context ) {
 
@@ -40,9 +44,6 @@ class DialogHandlers( val context:Context ) {
             val dialogProgressBar = findViewById<ProgressBar>(R.id.dialogProgressBar).apply {
                 visibility = View.GONE
             }
-
-
-
 
             val dialogImg = findViewById<ImageView>(R.id.dialogImage).apply {
                 visibility = View.INVISIBLE
@@ -99,42 +100,56 @@ class DialogHandlers( val context:Context ) {
 
     }
 
-    fun showSuccessFailureDialogue( isSuccess:Boolean, diaogText:String, hasActionButton:Boolean, onActionButtonClick:()->Unit = { Unit }){
+
+    fun showWarningDialog(
+        diaogText:String,
+        positiveButtonTxt:String = "Yes",
+        negativeButtonTxt:String = "Cancel",
+        onPositiveButtonClick:()->Unit = { Unit },
+        onNegativeButtonClick:()->Unit = { Unit },
+        dialogImgRes:Drawable = AppCompatResources.getDrawable(context,R.drawable.ic_error_round)!!,
+        buttonColorResId:Int = R.color.button_color_red
+    ){
 
         val uploadStatsDialog = Dialog(context).apply {
-            setContentView(R.layout.info_dialog)
+            setContentView(R.layout.warning_dialog)
             window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
 
+            val dialogPositiveButton = findViewById<Button>(R.id.dialogPositiveButton)
+            val dialogNegativeButton = findViewById<MaterialButton>(R.id.dialogNegativeButton)
+            val dialogImage =  findViewById<ImageView>(R.id.dialogImage)
+            val dialogText =  findViewById<TextView>(R.id.dialogText)
+
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-            findViewById<Button>(R.id.dialogCancelButton).setOnClickListener {
+            dialogPositiveButton.setBackgroundColor(context.getColor(buttonColorResId))
+
+            findViewById<Button>(R.id.dialogDismissButton).setOnClickListener {
                 dismiss()
             }
 
-            if(hasActionButton){
-                findViewById<Button>(R.id.dialogActionButton).apply {
-                    setOnClickListener {
-                        onActionButtonClick()
-                        dismiss()
-                    }
+            dialogText.setText(diaogText)
+            dialogImage.setImageDrawable(dialogImgRes)
 
-                    visibility = if( hasActionButton ) View.VISIBLE else View.GONE
-
+            dialogPositiveButton.apply {
+                text = positiveButtonTxt
+                setOnClickListener {
+                    onPositiveButtonClick()
+                    dismiss()
                 }
             }
 
-            findViewById<ImageView>(R.id.dialogImage).apply {
-                setImageResource(
-                    if(isSuccess) R.drawable.ic_check_filled else R.drawable.ic_error_round
-                )
+            dialogNegativeButton.apply {
+                text = negativeButtonTxt
+                setOnClickListener {
+                    onNegativeButtonClick()
+                    dismiss()
+                }
             }
 
-            findViewById<TextView>(R.id.dialogText).setText(
-                diaogText
-            )
             show()
 
         }

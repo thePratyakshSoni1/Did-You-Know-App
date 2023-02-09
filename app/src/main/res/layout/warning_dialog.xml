@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
@@ -37,7 +38,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/dialogImage" />
 
             <Button
-                android:id="@+id/dialogCancelButton"
+                android:id="@+id/dialogDismissButton"
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,30 +59,44 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dialogCancelButton"
-                app:srcCompat="@drawable/ic_check_filled" />
+                app:layout_constraintTop_toBottomOf="@+id/dialogDismissButton"
+                app:srcCompat="@drawable/ic_error_round" />
 
             <Button
-                android:id="@+id/dialogActionButton"
+                android:id="@+id/dialogPositiveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_gravity="start"
+                android:layout_marginTop="16dp"
                 android:text="Done"
+                app:backgroundTint="#4CAE50"
                 app:cornerRadius="100dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline2"
                 app:layout_constraintTop_toBottomOf="@+id/dialogText" />
 
-            <ProgressBar
-                android:id="@+id/dialogProgressBar"
-                style="?android:attr/progressBarStyle"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialogNegativeButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:text="Cancel"
+                android:textColor="#FF2424"
+                app:backgroundTint="@color/homefeed_background"
+                app:cornerRadius="100dp"
+                app:layout_constraintBottom_toBottomOf="@+id/dialogPositiveButton"
+                app:layout_constraintEnd_toStartOf="@+id/guideline2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/dialogPositiveButton"
+                app:strokeColor="#FE3636" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/dialogImage"
-                app:layout_constraintEnd_toEndOf="@+id/dialogImage"
-                app:layout_constraintStart_toStartOf="@+id/dialogImage"
-                app:layout_constraintTop_toTopOf="@+id/dialogImage" />
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

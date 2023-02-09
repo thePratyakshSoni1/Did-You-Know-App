@@ -1,5 +1,6 @@
 package com.example.didyouknow.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -85,6 +86,17 @@ class BlogDetailFragment : Fragment() {
 
         }
 
+        binding.postShareButton.setOnClickListener {
+            val actionInten = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, "https://didyouknowthat.onrender.com/article/${viewModel.blog.value?.data?.articleId}")
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(actionInten, "Did You Know ?")
+            startActivity(shareIntent)
+        }
+
         binding.updateButton.setOnClickListener {
 
 
@@ -94,7 +106,7 @@ class BlogDetailFragment : Fragment() {
             DialogHandlers(requireContext()).showProgressDialog(
                 viewLifecycleOwner,
                 blogUpdateStatus,
-                onDoneClick = { findNavController().popBackStack() },
+                onDoneClick = { Unit },
                 dialogErrorTxt = "Can't Post Blog",
                 dialogLoadingTxt = "Posting Blog...",
                 dialogSuccessTxt = "Blog Posted Successfully"
@@ -107,6 +119,7 @@ class BlogDetailFragment : Fragment() {
             if (result.status == Status.SUCCESS){
                 toast = "Blog Successfully updated"
                 blogUpdateStatus.postValue(Resources.success(true))
+                viewModel.refreshBlog()
             }
             else {
                 toast = result.message!!
