@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -83,6 +84,11 @@ class HomeFeedFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        binding.toolbar.setOnLongClickListener {
+            showMyDialog()
+            true
+        }
+
         viewModel.blogPosts.observe(viewLifecycleOwner){
             Toast.makeText(requireContext(),"Updating blogs", Toast.LENGTH_SHORT).show()
             blogsAdapter.blogs = it.data
@@ -97,6 +103,23 @@ class HomeFeedFragment : Fragment() {
         viewModel.refreshBlogs {
             binding.refreshLayout.isRefreshing = false
         }
+    }
+
+    private fun showMyDialog(){
+        DialogHandlers(requireContext()).showWarningDialog(
+            "This app is build by (Me) PRATYAKSH SONI\nYou can also visit \"didyouknowthat.onrender.com\" for public blog site view.\nMy Contact: pratyakshsoni2004@gmail.com",
+            positiveButtonTxt = "View Site",
+            negativeButtonTxt = "Back",
+            onPositiveButtonClick = {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW)
+                        .setData(Uri.parse("https://didyouknowthat.onrender.com/"))
+                )
+            },
+            onNegativeButtonClick = { Unit },
+            dialogImgRes = AppCompatResources.getDrawable(requireContext(), R.mipmap.ic_logo)!!,
+            buttonColorResId = R.color.button_color_green
+        )
     }
 
     private fun addListenerstoAdapter(){

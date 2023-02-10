@@ -13,4 +13,10 @@
         <item name="android:statusBarColor">@color/homefeed_background</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Splashing" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_bg</item>
+    </style>
+
+
 </resources>
