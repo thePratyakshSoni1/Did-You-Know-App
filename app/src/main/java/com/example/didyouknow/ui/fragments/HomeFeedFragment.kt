@@ -66,7 +66,7 @@ class HomeFeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         dialogHandlers = DialogHandlers(requireContext())
-        Toast.makeText(requireContext(),"You Are in HomeFrag", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(requireContext(),"You Are in HomeFrag", Toast.LENGTH_SHORT).show()
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = blogsAdapter
 
@@ -90,7 +90,7 @@ class HomeFeedFragment : Fragment() {
         }
 
         viewModel.blogPosts.observe(viewLifecycleOwner){
-            Toast.makeText(requireContext(),"Updating blogs", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(),"Updating blogs", Toast.LENGTH_SHORT).show()
             blogsAdapter.blogs = it.data
             Log.d("HomeFeedViewModelLogs","Blogs Updated ${blogsAdapter.blogs}")
         }
@@ -107,7 +107,7 @@ class HomeFeedFragment : Fragment() {
 
     private fun showMyDialog(){
         DialogHandlers(requireContext()).showWarningDialog(
-            "This app is build by (Me) PRATYAKSH SONI\nYou can also visit \"didyouknowthat.onrender.com\" for public blog site view.\nMy Contact: pratyakshsoni2004@gmail.com",
+            "Developer: PRATYAKSH SONI\n\nApp's Pulbic Site: \"didyouknowthat.onrender.com\"\n\nDev. Contact: pratyakshsoni2004@gmail.com",
             positiveButtonTxt = "View Site",
             negativeButtonTxt = "Back",
             onPositiveButtonClick = {
@@ -117,7 +117,7 @@ class HomeFeedFragment : Fragment() {
                 )
             },
             onNegativeButtonClick = { Unit },
-            dialogImgRes = AppCompatResources.getDrawable(requireContext(), R.mipmap.ic_logo)!!,
+            dialogImgRes = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_my_logo)!!,
             buttonColorResId = R.color.button_color_green
         )
     }

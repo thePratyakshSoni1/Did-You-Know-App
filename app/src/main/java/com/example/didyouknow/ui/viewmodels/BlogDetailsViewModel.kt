@@ -1,5 +1,7 @@
 package com.example.didyouknow.ui.viewmodels
 
+import android.net.Uri
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -73,7 +75,7 @@ class BlogDetailsViewModel @Inject constructor(
             blog.value?.data?.let{
                 _postTitle.postValue( it.title )
                 _postContent.postValue( it.content )
-                _postImgLink.postValue( it.imageUrl )
+                postValueToPostImageLink(it.imageUrl)
             }
         }
     }
@@ -91,7 +93,7 @@ class BlogDetailsViewModel @Inject constructor(
                 fieldsToUpdate.add(FirebaseDocFields.CONTENT)
             }
 
-            if(it?.imageUrl != postimgLink.value){
+            if(it?.imageUrl != postimgLink.value.toString()){
                 fieldsToUpdate.add(FirebaseDocFields.IMAGE_URL)
             }
 
@@ -128,7 +130,7 @@ class BlogDetailsViewModel @Inject constructor(
                         }
 
                         FirebaseDocFields.IMAGE_URL -> {
-                            val stats =  blogsDatasource.updateBlogImage(postimgLink.value!!, blog.value?.data?.articleId!!)
+                            val stats =  blogsDatasource.updateBlogImage(postimgLink.value.toString(), blog.value?.data?.articleId!!)
                             blogUpdatestatus.add(stats)
                         }
 
@@ -170,6 +172,7 @@ class BlogDetailsViewModel @Inject constructor(
 
         return if(allFieldsAreUpdated) Resources.success(true) else Resources.error(false, returnMsg)
     }
+
 
 
 }

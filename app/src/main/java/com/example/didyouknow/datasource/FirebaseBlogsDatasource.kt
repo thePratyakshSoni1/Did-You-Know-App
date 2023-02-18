@@ -1,13 +1,17 @@
 package com.example.didyouknow.datasource
 
+import android.net.Uri
 import android.util.Log
 import com.example.didyouknow.data.entities.BlogPost
 import com.example.didyouknow.data.remote.BlogsDatabase
+import com.example.didyouknow.data.remote.ImageStorageDatabase
 import com.example.didyouknow.other.Resources
+import com.example.didyouknow.other.Status
 import javax.inject.Inject
 
 class FirebaseBlogsDatasource @Inject constructor(
-    val blogsDatabse:BlogsDatabase
+    val blogsDatabse:BlogsDatabase,
+    val imageStorageDatabse:ImageStorageDatabase
 ){
 
     suspend  fun fetchAllBlogs(): Resources<List<BlogPost>> {
@@ -40,5 +44,8 @@ class FirebaseBlogsDatasource @Inject constructor(
     suspend fun updateBlogContent( newContent:String, articleId:String ): Resources<Boolean> = blogsDatabse.updateBlogContent(newContent, articleId)
     suspend fun updateBlogImage( newImageLink:String, articleId:String ): Resources<Boolean> = blogsDatabse.updateBlogImage(newImageLink, articleId)
 
+    suspend fun uploadImageForBlog(uri:Uri):Resources<Uri?>{
+        return imageStorageDatabse.uploadImage(uri)
+    }
 
 }

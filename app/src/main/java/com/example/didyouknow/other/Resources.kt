@@ -8,7 +8,7 @@ data class Resources<out T>(
 
     companion object{
 
-        fun <T> loading(data:T) = Resources(status= Status.LOADING, data)
+        fun <T> loading(data:T, message:String ="loading...") = Resources(status= Status.LOADING, data)
         fun <T> success(data:T) = Resources(status= Status.SUCCESS, data)
         fun <T> error(data:T, message:String?) = Resources(status= Status.ERROR, data, message)
 

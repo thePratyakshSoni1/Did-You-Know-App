@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -29,6 +30,9 @@ import com.example.didyouknow.other.Status
 import com.example.didyouknow.ui.viewmodels.AddpostFragmentViewModel
 import com.google.protobuf.DescriptorProtos.EnumDescriptorProto.EnumReservedRangeOrBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,14 +65,41 @@ class AddPostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         dialoghandler = DialogHandlers(requireContext())
         binding.viewmodel = viewModel
-        setObservers()
         setTextUpdaters()
         setPostButtonClickListener()
+        setChooseImgButtonClickListener()
+
+        viewModel.postimgLink.observe( viewLifecycleOwner ){
+            Log.d("AddPostFragmentLogs","ImgLinkValue Changed: $it")
+            viewModel.postImageLinkUpdateState(true)
+        }
 
 
 
         binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
+            dialoghandler.showWarningDialog(
+                "Discard posting blog ?",
+                positiveButtonTxt = "Keep Writting",
+                negativeButtonTxt = "Discard",
+                onPositiveButtonClick = { Unit },
+                onNegativeButtonClick = { findNavController().popBackStack() },
+                buttonColorResId = R.color.button_color_green
+            )
+        }
+
+    }
+
+    private fun setChooseImgButtonClickListener(){
+
+        val imageChooserContract = registerForActivityResult(
+            ActivityResultContracts.GetContent()
+        ){
+            binding.postImagePrev.setImageURI(it)
+            viewModel.setImageUri(it)
+        }
+
+        binding.imageChooseButotn.setOnClickListener {
+            imageChooserContract.launch("image/*")
         }
 
     }
@@ -76,20 +107,20 @@ class AddPostFragment : Fragment() {
     private fun setPostButtonClickListener(){
 
         val onPost = {
-            Toast.makeText(requireContext(), "Posting Blog", Toast.LENGTH_SHORT).show()
-
-            val postingStats = MutableLiveData<Resources<Boolean>>()
-            postingStats.postValue(Resources.loading(false))
+            val postingStats = MutableLiveData(Resources.loading(false))
             DialogHandlers(requireContext()).showProgressDialog(
                 viewLifecycleOwner,
                 postingStats,
                 onDoneClick = { findNavController().popBackStack() },
-                dialogErrorTxt = "Can't Post Blog",
+                dialogErrorTxt = postingStats.value?.message ?: "Can't post blog",
                 dialogLoadingTxt = "Posting Blog...",
                 dialogSuccessTxt = "Blog Posted Successfully"
             )
 
-            postingStats.postValue(viewModel.postBlog())
+            //Post blog to firebase
+            CoroutineScope(Dispatchers.IO).launch{
+                postingStats.postValue(viewModel.postBlog())
+            }
 
         }
 
@@ -111,13 +142,6 @@ class AddPostFragment : Fragment() {
         }
     }
 
-    private fun setObservers(){
-        viewModel.postimgLink.observe(viewLifecycleOwner){
-            glide.load(it).into(binding.postImagePrev)
-
-        }
-    }
-
     private fun setTextUpdaters(){
 
         binding.blogTitle.addTextChangedListener {
@@ -126,6 +150,7 @@ class AddPostFragment : Fragment() {
 
         binding.blogImageLink.addTextChangedListener {
             viewModel.updateBlogImageLinkTxt(it.toString())
+            Log.d("AddPostFragmentLogs","Changing img link to: ${it.toString()}")
         }
 
         binding.blogContent.addTextChangedListener {

@@ -1,5 +1,6 @@
 package com.example.didyouknow.other
 
+import android.net.Uri
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -20,25 +21,36 @@ abstract class BlogPostEditing: ViewModel() {
     protected var _postContent: MutableLiveData<String> = MutableLiveData("")
     val postContent get() = _postContent as LiveData<String>
 
-    protected var _postImgLink: MutableLiveData<String> = MutableLiveData("")
+    private var _postImgLink: MutableLiveData<String> = MutableLiveData()
     val postimgLink get() = _postImgLink as LiveData<String>
+
+    protected val _isLocalImage = MutableLiveData<Boolean>(false)
+    val isLocalImage get() = _isLocalImage as LiveData<Boolean>
+
+    protected var _imageUri: Uri? = null
+    val imageUri get() = _imageUri
+
+    private var _isPostImgLinkUpdated: Boolean = false
+    val isPostImgLinkUpdated: Boolean get() = _isPostImgLinkUpdated
+
+    private var _blogPostingStatus = MutableLiveData<Resources<Boolean?>>()
+    val blogPostingStatus get() = _blogPostingStatus as LiveData<Resources<Boolean?>>
+
 
     protected fun isContentvalid():Boolean{
         return if(postContent.value?.isNotEmpty() == true){
-            Log.d("BlogPostEditingLogs","Invalid Content")
             true
         }else{
+            Log.d("BlogPostEditingLogs","Invalid Content")
             false
         }
     }
 
     protected fun isImgLinkvalid():Boolean {
-        return if(postimgLink.value?.isNotEmpty() == true && isvalidImage){
-            Log.d("BlogPostEditingLogs","Invalid Image Link")
-            true
-        }else{
-            false
-        }
+
+        return if(isLocalImage.value == true && imageUri != null) imageUri!!.isAbsolute && imageUri.toString().isNotEmpty()
+        else (postimgLink.value?.toString()?.isNotEmpty() == true && isvalidImage)
+
     }
 
 
@@ -59,6 +71,15 @@ abstract class BlogPostEditing: ViewModel() {
 
     fun setImageValidity(isvalid:Boolean){
         isvalidImage = isvalid
+    }
+
+    fun postValueToPostImageLink(uri:String){
+        _isPostImgLinkUpdated = false
+        _postImgLink.postValue(uri)
+    }
+
+    fun postImageLinkUpdateState(isUpdated:Boolean){
+        _isPostImgLinkUpdated = true
     }
 
     fun updateBlogTitleTxt(newTxt:String)= _postTitle.postValue(newTxt)

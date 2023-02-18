@@ -7,6 +7,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.didyouknow.R
 import com.example.didyouknow.adapters.HomeFeedAdapter
 import com.example.didyouknow.data.remote.BlogsDatabase
+import com.example.didyouknow.data.remote.ImageStorageDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,6 +37,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideBogDatabase() = BlogsDatabase()
+    @Provides
+    @Singleton
+    fun provideImageStorageDatabase() = ImageStorageDatabase()
 
     @Provides
     @Singleton

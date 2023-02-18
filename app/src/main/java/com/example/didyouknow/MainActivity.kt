@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
     private var binding:ActivityMainBinding? = null
     private lateinit var navController:NavHostFragment
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_DidYouKnow)
