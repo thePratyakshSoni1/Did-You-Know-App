@@ -31,42 +31,56 @@ class AddpostFragmentViewModel @Inject constructor(
         var postingBlogStatus: Resources<Boolean> =  Resources.loading(false)
 
         if(isValidBlogPost){
-                val imageUploadTask:Resources<Uri?> = uploadImageToFirebase()
-                if(imageUploadTask.status == Status.SUCCESS){
-                    val imageLink = imageUploadTask.data
-                    viewModelScope.launch{
-                        postValueToPostImageLink(imageLink.toString())
-                    }
-                    var delayTaken = 0L
-                    while(!isPostImgLinkUpdated && delayTaken < 5000L ){
-                        delayTaken+= 200L
-                        delay(200L)
-                    }
-                    if(isPostImgLinkUpdated){
-                        Log.d("AddPostFragmentLogs","Link we got: ${postimgLink.value} from ${imageLink.toString()}")
-                        Log.d("AddPostFragmentLogs",imageLink.toString())
-                        val blogToPost = prepareBlogPost(generatedBlogId)
-                        postingBlogStatus = blogsDatasource.postBlog(blogToPost)
-                    }else{
-                        Log.d("AddPostFragmentLogs","Error attaching link to blogPost, value update timeout")
-                        postingBlogStatus = Resources.error(false,"Error attaching link to blogPost\nPlease  try again")
-                    }
+            lateinit var blogToPost:BlogPost
+            postingBlogStatus = if(isLocalImage.value == true){
+            val imageUploadTask:Resources<Pair<String,Uri>?> = uploadImageToFirebase()
+            if(imageUploadTask.status == Status.SUCCESS){
+                val imageLink = imageUploadTask.data
+                viewModelScope.launch{
+                    postValueToPostImageLink(imageLink)
                 }
-                else Log.d("AddPostViewModelLogs","Image not uploaded ${imageUploadTask.message}")
+                var delayTaken = 0L
+
+                //postImgLink is updating late so waiting for that
+                while(!isPostImgLinkUpdated && delayTaken < 5000L ){
+                    delayTaken+= 200L
+                    delay(200L)
+                }
+
+                if(isPostImgLinkUpdated){
+                    logConsole("Link we got: ${postimgLink.value} from ${imageLink.toString()}")
+                    logConsole(imageLink.toString())
+                    blogToPost = prepareBlogPost(generatedBlogId)
+                    blogsDatasource.postBlog(blogToPost)
+                }else{
+                    logConsole("Error attaching link to blogPost, value update timeout")
+                    val deleteImageTask = blogsDatasource.deleteBlogImage(imageUploadTask.data!!.first)
+                    logConsole("Deleteing uploaded image success: ${deleteImageTask.data}")
+                    Resources.error(false,"Error attaching link to blogPost\nPlease  try again")
+                }
+            }else{
+                Resources.error(false, "Image cann't be uploaded")
+            }
+
+        }else{
+            blogToPost = prepareBlogPost(generatedBlogId)
+            blogsDatasource.postBlog(blogToPost)
+        }
+
 
         }else{
             Log.d("AddPostViewModelLogs","Invalid Blog found")
-            postingBlogStatus = Resources.loading(false)
+            postingBlogStatus = Resources.error(false, "Invalid Blog")
         }
 
         return postingBlogStatus
     }
 
-    private fun uploadImageToFirebase(  ):Resources<Uri?>{
-        lateinit var imageUploadStatus:Resources<Uri?>
+    private fun uploadImageToFirebase(  ):Resources<Pair<String,Uri>?>{
+        lateinit var imageUploadStatus:Resources<Pair<String,Uri>?>
         return if(imageUri != null ){
             runBlocking {
-                Log.d("AddPostFragmentLogs","uploading from  uri: ${imageUri.toString()}")
+                logConsole("uploading from  uri: ${imageUri.toString()}")
                 imageUploadStatus = blogsDatasource.uploadImageForBlog(uri = imageUri!!)
             }
             imageUploadStatus
@@ -90,10 +104,15 @@ class AddpostFragmentViewModel @Inject constructor(
             title= postTitle.value!!,
             articleId = docId,
             imageUrl = postimgLink.value.toString(),
+            imageName= postImgName
 
         )
 
 
+    }
+
+    private fun logConsole(text:String){
+       Log.d("AddPostFragmentLogs",text)
     }
 
     private fun generateBlogDocId():String{

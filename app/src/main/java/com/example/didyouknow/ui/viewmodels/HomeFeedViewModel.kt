@@ -9,6 +9,7 @@ import com.example.didyouknow.datasource.FirebaseBlogsDatasource
 import com.example.didyouknow.other.Resources
 import com.example.didyouknow.other.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -51,11 +52,17 @@ class HomeFeedViewModel @Inject constructor (
 
     }
 
-    fun deleteBlog(blogId:String):Resources<Boolean>{
+    fun deleteBlog(blogId:String, imageName:String?):Resources<Boolean>{
 
         val status:Resources<Boolean>
         runBlocking {
-            status = blogsDataSource.deleteBlogDoc( blogId )
+            val blogDeleteTask = async { blogsDataSource.deleteBlogDoc( blogId ) }
+            val imageDeleteTask = if( !imageName.isNullOrEmpty() ){
+                async{ blogsDataSource.deleteBlogImage(imageName) }
+            }else null
+
+            status = blogDeleteTask.await()
+            imageDeleteTask?.await() ?: Unit
         }
         return status
 

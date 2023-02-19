@@ -24,6 +24,10 @@ abstract class BlogPostEditing: ViewModel() {
     private var _postImgLink: MutableLiveData<String> = MutableLiveData()
     val postimgLink get() = _postImgLink as LiveData<String>
 
+
+    private var _postImgName: String? = null
+    val postImgName get() = _postImgName as String?
+
     protected val _isLocalImage = MutableLiveData<Boolean>(false)
     val isLocalImage get() = _isLocalImage as LiveData<Boolean>
 
@@ -73,9 +77,10 @@ abstract class BlogPostEditing: ViewModel() {
         isvalidImage = isvalid
     }
 
-    fun postValueToPostImageLink(uri:String){
+    fun postValueToPostImageLink(imageLink:Pair<String?,Uri>?){
         _isPostImgLinkUpdated = false
-        _postImgLink.postValue(uri)
+        _postImgLink.postValue(imageLink?.second.toString())
+        _postImgName = imageLink?.first
     }
 
     fun postImageLinkUpdateState(isUpdated:Boolean){

@@ -44,8 +44,13 @@ class FirebaseBlogsDatasource @Inject constructor(
     suspend fun updateBlogContent( newContent:String, articleId:String ): Resources<Boolean> = blogsDatabse.updateBlogContent(newContent, articleId)
     suspend fun updateBlogImage( newImageLink:String, articleId:String ): Resources<Boolean> = blogsDatabse.updateBlogImage(newImageLink, articleId)
 
-    suspend fun uploadImageForBlog(uri:Uri):Resources<Uri?>{
+    suspend fun uploadImageForBlog(uri:Uri):Resources<Pair<String,Uri>?>{
         return imageStorageDatabse.uploadImage(uri)
+    }
+    suspend fun deleteBlogImage(imageName:String):Resources<Boolean>{
+        val taskResults = imageStorageDatabse.deleteBlogImage(imageName)
+        Log.d("FirebaseBlogsSourceLogs",if(taskResults.status == Status.SUCCESS) "Delted blog image success fully" else "Blogs image cannot be deleted")
+        return taskResults
     }
 
 }

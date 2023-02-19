@@ -9,5 +9,6 @@ data class BlogPost (
     val articleId:String="",
     val imageUrl:String="",
     val totalDislikes:Long=0L,
-    val totalLikes:Long=0L
+    val totalLikes:Long=0L,
+    val imageName:String? = ""
 )

@@ -143,7 +143,7 @@ class HomeFeedFragment : Fragment() {
                 val action = HomeFeedFragmentDirections.actionHomeFeedFragmentToBlogDetailFragment3(it, true)
                 findNavController().navigate(action)
             },
-            onDeleteMenuClick = { blogDocId ->
+            onDeleteMenuClick = { blogDocId, imgName ->
 
                 val blogTitle = blogsAdapter.blogs.find {
                     it.articleId == blogDocId
@@ -166,7 +166,7 @@ class HomeFeedFragment : Fragment() {
                             dialogLoadingTxt = "Deleting your blog",
                             dialogErrorTxt = "Error while deleting !"
                         )
-                        deletionStatus.postValue(viewModel.deleteBlog(blogDocId))
+                        deletionStatus.postValue(viewModel.deleteBlog(blogDocId, imgName))
                     },
                     onNegativeButtonClick = {
                         Unit

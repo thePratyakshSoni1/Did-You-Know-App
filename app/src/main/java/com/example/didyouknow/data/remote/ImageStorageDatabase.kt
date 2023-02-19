@@ -23,9 +23,9 @@ class ImageStorageDatabase {
     private val firebaseStorageInstance = FirebaseStorage.getInstance()
     private val firebaseStorageRef = firebaseStorageInstance.getReference(STORAGEUTILS.BLOGS_IMAGE_STORAGE_PATH)
 
-    fun uploadImage(uri:Uri):Resources<Uri?> {
+    fun uploadImage(uri:Uri):Resources<Pair<String,Uri>?> {
 
-        lateinit var results:Resources<Uri?>
+        lateinit var results:Resources<Pair<String,Uri>?>
         runBlocking {
 
             var isUploadSuccess:Boolean = false
@@ -53,8 +53,8 @@ class ImageStorageDatabase {
         return results
     }
 
-    fun getImageDownloadLinkForBlog(imageName:String):Resources<Uri?>{
-        lateinit var results:Resources<Uri?>
+    fun getImageDownloadLinkForBlog(imageName:String):Resources<Pair<String,Uri>?>{
+        lateinit var results:Resources<Pair<String,Uri>?>
         runBlocking {
 
             try{
@@ -63,7 +63,7 @@ class ImageStorageDatabase {
                 task.await()
                 results = if(task.isSuccessful) {
                     Log.d(IMAGEBDLOGSTAG,"SUCCESS Fetching image link")
-                    Resources.success(task.result)
+                    Resources.success(Pair(imageName, task.result))
                 }
                 else {
                     Log.d(IMAGEBDLOGSTAG,"Failed Fetching image link link")
@@ -81,6 +81,20 @@ class ImageStorageDatabase {
     private object STORAGEUTILS{
 
         var BLOGS_IMAGE_STORAGE_PATH = "blogImageUploads"
+
+    }
+
+    fun deleteBlogImage(imageName:String):Resources<Boolean>{
+
+        val imgRef = firebaseStorageRef.child(imageName)
+        lateinit var results:Resources<Boolean>
+        runBlocking {
+            val deleteImageTask = imgRef.delete()
+            deleteImageTask.await()
+            results = if( deleteImageTask.isSuccessful ) Resources.success(true)
+            else Resources.error(false, "Failed to delete image from databsse")
+        }
+        return  results
 
     }
 

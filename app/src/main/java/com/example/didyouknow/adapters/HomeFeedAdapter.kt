@@ -86,7 +86,7 @@ class HomeFeedAdapter (
 
                         R.id.postDeleteMenuItem -> {
                             onDeleteListener?.let {click ->
-                                click(blogs[position].articleId)
+                                click(blogs[position].articleId, blogs[position].imageName)
                             }
                             true
                         }
@@ -108,7 +108,7 @@ class HomeFeedAdapter (
     private var clickListener:((blogDocId:String)->Unit)? = null
     private var onShareListener:((blogDocId:String)->Unit)? = null
     private var onEditListener:((blogDocId:String)->Unit)? = null
-    private var onDeleteListener:((blogDocId:String)->Unit)? = null
+    private var onDeleteListener:((blogDocId:String, imageName:String? )->Unit)? = null
 
     override fun getItemCount(): Int {
         return blogs.size
@@ -117,7 +117,7 @@ class HomeFeedAdapter (
     fun setClickListeners(
         postClickListener:(blogDocId:String)->Unit,
         onShareMenuClick:( blogDocId:String ) -> Unit,
-        onDeleteMenuClick:( blogDocId:String ) -> Unit,
+        onDeleteMenuClick:( blogDocId:String, imageName:String? ) -> Unit,
         onEditMenuClick:( blogDocId:String ) -> Unit
 
     ){

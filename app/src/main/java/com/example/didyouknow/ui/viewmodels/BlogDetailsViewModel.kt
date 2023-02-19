@@ -75,7 +75,7 @@ class BlogDetailsViewModel @Inject constructor(
             blog.value?.data?.let{
                 _postTitle.postValue( it.title )
                 _postContent.postValue( it.content )
-                postValueToPostImageLink(it.imageUrl)
+                postValueToPostImageLink(Pair(it.imageName, Uri.parse(it.imageUrl)))
             }
         }
     }
