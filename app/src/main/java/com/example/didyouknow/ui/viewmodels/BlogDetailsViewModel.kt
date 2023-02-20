@@ -1,6 +1,7 @@
 package com.example.didyouknow.ui.viewmodels
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+private const val LOGTAG = "BlogsDetailVMLogs"
 @HiltViewModel
 class BlogDetailsViewModel @Inject constructor(
     val blogsDatasource: FirebaseBlogsDatasource
@@ -93,7 +95,7 @@ class BlogDetailsViewModel @Inject constructor(
                 fieldsToUpdate.add(FirebaseDocFields.CONTENT)
             }
 
-            if(it?.imageUrl != postimgLink.value.toString()){
+            if( it?.imageUrl != postimgLink.value.toString() ){
                 fieldsToUpdate.add(FirebaseDocFields.IMAGE_URL)
             }
 
@@ -107,7 +109,7 @@ class BlogDetailsViewModel @Inject constructor(
         val isBlogValid = isTitleValid() && isContentvalid() && isImgLinkvalid()
         val fieldsToUpdate = getInfoAboutFieldsToUpdate()
 
-        val blogUpdatestatus:MutableList<Resources<Boolean>> = mutableListOf()
+        val blogUpdatestatus:MutableList<Resources<String>> = mutableListOf()
 
         if(!isBlogValid){
             return Resources.error(false, "Your Blog isn't valid")
@@ -122,21 +124,63 @@ class BlogDetailsViewModel @Inject constructor(
 
                         FirebaseDocFields.TITLE -> {
                             val stats =  blogsDatasource.updateBlogTitle(postTitle.value!!, blog.value?.data?.articleId!!)
-                            blogUpdatestatus.add(stats)
+                            blogUpdatestatus.add(Resources(stats.status, "title", null))
                         }
                         FirebaseDocFields.CONTENT -> {
                             val stats =  blogsDatasource.updateBlogContent(postContent.value!!, blog.value?.data?.articleId!!)
-                            blogUpdatestatus.add(stats)
+                            blogUpdatestatus.add(Resources(stats.status, "content", null))
                         }
 
                         FirebaseDocFields.IMAGE_URL -> {
-                            val stats =  blogsDatasource.updateBlogImage(postimgLink.value.toString(), blog.value?.data?.articleId!!)
-                            blogUpdatestatus.add(stats)
+
+                            val stats:Resources<Boolean> = if(isLocalImage.value == true && imageUri != null ){
+                                val imageUploadTask = uploadImageToFirebase(blogsDatasource)
+                                if(imageUploadTask.status == Status.SUCCESS){
+                                    val imageLink = imageUploadTask.data
+                                    viewModelScope.launch{
+                                        postValueToPostImageLink(imageLink)
+                                    }
+                                    var delayTaken = 0L
+
+                                    //postImgLink is updating late so waiting for that
+                                    while(!isPostImgLinkUpdated && delayTaken < 5000L ){
+                                        delayTaken+= 200L
+                                        delay(200L)
+                                    }
+
+                                    if(isPostImgLinkUpdated){
+                                        logConsole("Link we got: ${postimgLink.value} from ${imageLink.toString()}")
+                                        logConsole(imageLink.toString())
+                                        blogsDatasource.updateBlogImage(postimgLink.value.toString(), blog.value?.data?.articleId!!)
+                                    }else{
+                                        logConsole("Error attaching link to blogPost, value update timeout")
+                                        val deleteImageTask = blogsDatasource.deleteBlogImage(imageUploadTask.data!!.first)
+                                        logConsole("Deleteing uploaded image success: ${deleteImageTask.data}")
+                                        Resources.error(false,"Error attaching link to blogPost\nPlease  try again")
+                                    }
+                                }else{
+                                    Resources.error(false, "Image can't be uploaded")
+                                }
+                            }else{
+                                blogsDatasource.updateBlogImage(postimgLink.value.toString(), blog.value?.data?.articleId!!)
+                            }
+                            if(stats.status == Status.SUCCESS){
+                                viewModelScope.launch {
+                                    if(!blog.value?.data?.imageName.isNullOrEmpty()){
+                                        val imgDeleteTask = blogsDatasource.deleteBlogImage(blog.value?.data?.imageName!!)
+                                        if(imgDeleteTask.status == Status.SUCCESS){
+                                            logConsole("Previous Image delted successfully")
+                                        }else{
+                                            logConsole("Failed deleting Previous Image ")
+                                        }
+                                    }
+                                }
+                            }
+                            blogUpdatestatus.add(Resources(stats.status, "image", null))
                         }
 
                         else -> Unit
                     }
-
                 }
             }
 
@@ -148,29 +192,34 @@ class BlogDetailsViewModel @Inject constructor(
 
     }
 
-    private fun generateUpdateStats(blogUpdatestatus:List<Resources<Boolean>>):Resources<Boolean>{
+    private fun logConsole(text:String){
+        Log.d(LOGTAG, text)
+    }
+    private fun generateUpdateStats(blogUpdatestatus:List<Resources<String>>):Resources<Boolean>{
 
-        var returnMsg = ""
-        var allFieldsAreUpdated = true
+        var returnMsg = "Unable to update: "
+        var noOfFailedUpdations = 0
 
         for(items in blogUpdatestatus){
             if(items.status != Status.SUCCESS){
-                allFieldsAreUpdated = false
-                break
+                noOfFailedUpdations++
+                returnMsg += items.data
             }
         }
 
-        if( !allFieldsAreUpdated ){
-
+        if( noOfFailedUpdations == 0 ){
+            return Resources.success(true)
+        }else if( noOfFailedUpdations > 0 ){
             blogUpdatestatus.forEach {
                 if(it.status == Status.ERROR){
                     returnMsg += "${it.message}\n"
                 }
             }
-
+            return Resources.partialSuccess(true, returnMsg)
+        }else{
+            return Resources.error(false, "Blog Updation failed")
         }
 
-        return if(allFieldsAreUpdated) Resources.success(true) else Resources.error(false, returnMsg)
     }
 
 

@@ -62,40 +62,45 @@
                 app:layout_constraintTop_toBottomOf="@+id/dialogDismissButton"
                 app:srcCompat="@drawable/ic_error_round" />
 
-            <Button
-                android:id="@+id/dialogPositiveButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="14dp"
                 android:layout_marginTop="16dp"
-                android:text="Done"
-                app:backgroundTint="#4CAE50"
-                app:cornerRadius="100dp"
+                android:layout_marginEnd="14dp"
+                android:orientation="horizontal"
+                android:weightSum="2"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline2"
-                app:layout_constraintTop_toBottomOf="@+id/dialogText" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/dialogNegativeButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:text="Cancel"
-                android:textColor="#FF2424"
-                app:backgroundTint="@color/homefeed_background"
-                app:cornerRadius="100dp"
-                app:layout_constraintBottom_toBottomOf="@+id/dialogPositiveButton"
-                app:layout_constraintEnd_toStartOf="@+id/guideline2"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/dialogPositiveButton"
-                app:strokeColor="#FE3636" />
+                app:layout_constraintTop_toBottomOf="@+id/dialogText">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dialogNegativeButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:text="Cancel"
+                    android:textColor="#FF2424"
+                    app:backgroundTint="@color/homefeed_background"
+                    app:cornerRadius="100dp"
+                    app:strokeColor="#FE3636" />
+
+                <Button
+                    android:id="@+id/dialogPositiveButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="Done"
+                    app:backgroundTint="#4CAE50"
+                    app:cornerRadius="100dp" />
+
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

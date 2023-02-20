@@ -33,7 +33,7 @@ class AddpostFragmentViewModel @Inject constructor(
         if(isValidBlogPost){
             lateinit var blogToPost:BlogPost
             postingBlogStatus = if(isLocalImage.value == true){
-            val imageUploadTask:Resources<Pair<String,Uri>?> = uploadImageToFirebase()
+            val imageUploadTask:Resources<Pair<String,Uri>?> = uploadImageToFirebase(blogsDatasource)
             if(imageUploadTask.status == Status.SUCCESS){
                 val imageLink = imageUploadTask.data
                 viewModelScope.launch{
@@ -74,27 +74,6 @@ class AddpostFragmentViewModel @Inject constructor(
         }
 
         return postingBlogStatus
-    }
-
-    private fun uploadImageToFirebase(  ):Resources<Pair<String,Uri>?>{
-        lateinit var imageUploadStatus:Resources<Pair<String,Uri>?>
-        return if(imageUri != null ){
-            runBlocking {
-                logConsole("uploading from  uri: ${imageUri.toString()}")
-                imageUploadStatus = blogsDatasource.uploadImageForBlog(uri = imageUri!!)
-            }
-            imageUploadStatus
-        }else{
-            Log.d("AddPostViewModelLogs","Null Image uri while uploading to firebase storage")
-            imageUploadStatus = Resources.error(null,"URI IS NULL")
-            imageUploadStatus
-        }
-
-    }
-
-    fun setImageUri(uri: Uri?){
-        _isLocalImage.postValue(uri != null)
-        _imageUri = uri
     }
 
     private fun prepareBlogPost( docId:String ):BlogPost{

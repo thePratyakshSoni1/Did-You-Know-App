@@ -38,7 +38,7 @@
                 android:layout_marginHorizontal="16dp">
 
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/toolbarNavButton"
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
@@ -106,6 +106,9 @@
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@color/add_post_fragment_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
 
@@ -180,7 +183,7 @@
                             android:focusableInTouchMode="@{viewmodel.isEditingMode()}"
                             android:paddingHorizontal="14dp"
                             android:paddingVertical="8dp"
-                            android:text="@{viewmodel.blog.data.title}"
+                            android:text="@{viewmodel.postTitle}"
                             android:textColor="@color/post_text"
                             android:textSize="18dp"
                             android:textStyle="bold"
@@ -195,9 +198,7 @@
                             android:layout_marginTop="8dp"
                             android:background="@drawable/textfiled_shape"
                             android:orientation="vertical"
-                            android:padding="12dp"
-                            android:visibility="@{ viewmodel.isEditingMode() ? View.VISIBLE : View.GONE }"
-                            tools:visibility="visible">
+                            android:padding="12dp">
 
 
                             <LinearLayout
@@ -214,7 +215,7 @@
                                     android:layout_marginEnd="8dp"
                                     android:orientation="vertical">
 
-                                    <Button
+                                    <com.google.android.material.button.MaterialButton
                                         android:id="@+id/postLikeButton"
                                         style="@style/Widget.Material3.Button.IconButton"
                                         android:layout_width="wrap_content"
@@ -238,10 +239,10 @@
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:layout_marginEnd="8dp">
+                                    android:layout_marginEnd="8dp"
+                                    android:orientation="vertical">
 
-                                    <Button
+                                    <com.google.android.material.button.MaterialButton
                                         android:id="@+id/postDislikeButton"
                                         style="@style/Widget.Material3.Button.IconButton"
                                         android:layout_width="wrap_content"
@@ -267,7 +268,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical">
 
-                                    <Button
+                                    <com.google.android.material.button.MaterialButton
                                         android:id="@+id/postShareButton"
                                         style="@style/Widget.Material3.Button.IconButton"
                                         android:layout_width="wrap_content"
@@ -292,25 +293,48 @@
 
                         </LinearLayout>
 
-                        <EditText
-                            android:id="@+id/imgLinkTextView"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/imgLinkBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:background="@drawable/textfiled_shape"
-                            android:clickable="@{viewmodel.isEditingMode()}"
-                            android:cursorVisible="@{viewmodel.isEditingMode()}"
-                            android:focusable="@{viewmodel.isEditingMode()}"
-                            android:focusableInTouchMode="@{viewmodel.isEditingMode()}"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="8dp"
-                            android:text="@{viewmodel.blog.data.imageUrl}"
-                            android:textColor="@color/post_text"
-                            android:textSize="18dp"
-                            android:textStyle="bold"
                             android:visibility="@{ viewmodel.isEditingMode() ? View.VISIBLE : View.GONE }"
-                            tools:text="Hello this year MMB gets the oscar award of 2023 !"
-                            tools:visibility="gone" />
+                            tools:visibility="gone">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/chooseImgButton"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
+                                android:backgroundTint="@{(viewmodel.isLocalImage() == true) ? @color/button_color_red : @color/black }"
+                                app:cornerRadius="100dp"
+                                app:icon="@{(viewmodel.isLocalImage() == true) ? @drawable/ic_cancel : @drawable/ic_add }"
+                                app:rippleColor="#2A474747"
+                                app:iconTint="@color/add_post_fragment_background"
+                                app:layout_constraintBottom_toBottomOf="@+id/imgLinkTextView"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="@+id/imgLinkTextView" />
+
+                            <EditText
+                                android:id="@+id/imgLinkTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:background="@drawable/textfiled_shape"
+                                android:enabled="@{ viewmodel.isEditingMode() &amp;&amp; !(viewmodel.isLocalImage() == true) }"
+                                android:padding="12dp"
+                                android:text="@{ viewmodel.postimgLink }"
+                                android:textColor="@color/post_text"
+                                android:textSize="14sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/chooseImgButton"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="Hello award of 2023 !"
+                                tools:visibility="visible" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <EditText
                             android:id="@+id/postContent"

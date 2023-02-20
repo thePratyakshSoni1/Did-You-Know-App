@@ -10,6 +10,8 @@ data class Resources<out T>(
 
         fun <T> loading(data:T, message:String ="loading...") = Resources(status= Status.LOADING, data)
         fun <T> success(data:T) = Resources(status= Status.SUCCESS, data)
+
+        fun <T> partialSuccess(data:T, message:String) = Resources(status= Status.PARTIAL_SUCCESS, data, message)
         fun <T> error(data:T, message:String?) = Resources(status= Status.ERROR, data, message)
 
     }
@@ -19,5 +21,6 @@ data class Resources<out T>(
 enum class Status{
     LOADING,
     ERROR,
-    SUCCESS
+    SUCCESS,
+    PARTIAL_SUCCESS
 }

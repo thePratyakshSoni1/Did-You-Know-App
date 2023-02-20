@@ -92,7 +92,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
-                        tools:srcCompat="@drawable/ss_proto" />
+                        app:srcCompat="@drawable/ic_placeholder" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -116,38 +116,60 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/blogImageLink" />
+                    app:layout_constraintTop_toBottomOf="@+id/imageLinkBoxContainer" />
 
-                <EditText
-                    android:id="@+id/blogImageLink"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/imageLinkBoxContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="14dp"
-                    android:background="@drawable/textfiled_shape"
-                    android:gravity="top|left"
-                    android:hint="Image Link: https://img.."
-                    android:maxLines="1"
-                    android:overScrollMode="always"
-                    android:padding="14dp"
-                    android:textColorHint="@color/add_post_hint"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imgPrevContainer" />
+                    app:layout_constraintTop_toBottomOf="@+id/imgPrevContainer">
 
-                <Button
-                    android:id="@+id/imageChooseButotn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:background="@drawable/right_corner_button"
-                    android:padding="8dp"
-                    android:text="Choose File"
-                    android:textColor="#FAFAFA"
-                    app:tint="@null"
-                    app:layout_constraintBottom_toBottomOf="@+id/blogImageLink"
-                    app:layout_constraintEnd_toEndOf="@+id/blogImageLink"
-                    app:layout_constraintTop_toTopOf="@+id/blogImageLink" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/imageChooseButotn"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:backgroundTint="@{(viewmodel.isLocalImage() == true) ? @color/button_color_red : @color/black }"
+                        app:cornerRadius="100dp"
+                        app:icon="@{(viewmodel.isLocalImage() == true) ? @drawable/ic_cancel : @drawable/ic_add }"
+                        app:iconTint="@color/add_post_fragment_background"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/imageLinkBoxContainer"
+                        app:layout_constraintTop_toTopOf="@+id/blogImageLink"
+                        app:rippleColor="#2A474747" />
+
+                    <EditText
+                        android:id="@+id/blogImageLink"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/textfiled_shape"
+                        android:enabled="@{!(viewmodel.isLocalImage() == true) }"
+                        android:gravity="top|left"
+                        android:hint="Image Link: https://img.."
+                        android:maxLines="1"
+                        android:overScrollMode="always"
+                        android:paddingStart="14dp"
+                        android:paddingLeft="14dp"
+                        android:paddingTop="18dp"
+                        android:paddingEnd="14dp"
+                        android:paddingRight="14dp"
+                        android:paddingBottom="18dp"
+                        android:textColorHint="@color/add_post_hint"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/imageChooseButotn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
 
                 <EditText
                     android:id="@+id/blogContent"

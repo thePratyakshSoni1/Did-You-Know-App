@@ -8,10 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
@@ -20,6 +21,9 @@ import com.example.didyouknow.databinding.FragmentBlogDetailBinding
 import com.example.didyouknow.other.*
 import com.example.didyouknow.ui.viewmodels.BlogDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 
@@ -34,7 +38,7 @@ class BlogDetailFragment : Fragment() {
 
     private val viewModel by viewModels<BlogDetailsViewModel>()
 
-
+    lateinit var imageImportContract: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,6 +63,14 @@ class BlogDetailFragment : Fragment() {
         setListeners()
         setObservers()
         setTextUpdaters()
+
+
+        imageImportContract = registerForActivityResult(ActivityResultContracts.GetContent()) {
+                binding.postThumbnail.setImageURI(it)
+                viewModel.setImageLocalUri(it)
+                viewModel.postValueToPostImageLink(null)
+        }
+
 
         viewModel.initializeViewModel(
             blogId = arguments?.getString(NavigationKeys.KEY_BLOG_DOC_ID)!!,
@@ -109,23 +121,36 @@ class BlogDetailFragment : Fragment() {
                 onDoneClick = { Unit },
                 dialogErrorTxt = "Can't Post Blog",
                 dialogLoadingTxt = "Posting Blog...",
-                dialogSuccessTxt = "Blog Posted Successfully"
+                dialogSuccessTxt = "Blog Posted Successfully",
             )
+            CoroutineScope(Dispatchers.IO).launch{
+                val result = viewModel.updateBlog()
 
-            val result = viewModel.updateBlog()
+                var toast: String
+                viewModel.setEditingMode(false)
+                if (result.status == Status.SUCCESS) {
+                    toast = "Blog Successfully updated"
+                    blogUpdateStatus.postValue(Resources.success(true))
+                    viewModel.refreshBlog()
+                } else if (result.status == Status.PARTIAL_SUCCESS) {
+                    toast = "Some fields aren't updated"
+                    blogUpdateStatus.postValue(Resources.partialSuccess(true, result.message!!))
+                    viewModel.refreshBlog()
+                } else {
+                    toast = result.message!!
+                    blogUpdateStatus.postValue(Resources.error(false, "Can't post blog !"))
+                }
+                Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
+            }
+        }
 
-            var toast:String
-            viewModel.setEditingMode(false)
-            if (result.status == Status.SUCCESS){
-                toast = "Blog Successfully updated"
-                blogUpdateStatus.postValue(Resources.success(true))
-                viewModel.refreshBlog()
+        binding.chooseImgButton.setOnClickListener {
+
+            if( viewModel.isLocalImage.value == true ){
+                viewModel.setImageLocalUri(null)
+            }else{
+                imageImportContract.launch("image/*")
             }
-            else {
-                toast = result.message!!
-                blogUpdateStatus.postValue(Resources.error(false, "Can't post blog !"))
-            }
-            Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT ).show()
 
         }
 
@@ -156,9 +181,9 @@ class BlogDetailFragment : Fragment() {
 
             when(it.status){
 
-                Status.LOADING -> toggleBlogVisibility(setBlogToVisible = false, setloading = true)
+                Status.LOADING -> toggleBlogVisibility(setBlogToVisible = false )
 
-                Status.SUCCESS ->{
+                Status.SUCCESS , Status.PARTIAL_SUCCESS ->{
                     it.data.let{ blog ->
                         if(blog != null){
                             toggleBlogVisibility( setBlogToVisible = true )
@@ -184,7 +209,11 @@ class BlogDetailFragment : Fragment() {
         }
 
         viewModel.postimgLink.observe(viewLifecycleOwner){
-            glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
+            if(it != ""){
+                viewModel.postImageLinkUpdateState(true)
+            }else{
+                glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
+            }
         }
 
         viewModel.isRefreshing.observe(viewLifecycleOwner){
@@ -195,8 +224,7 @@ class BlogDetailFragment : Fragment() {
 
     private fun toggleBlogVisibility(
         setBlogToVisible:Boolean,
-        setError:Boolean = false,
-        setloading:Boolean= false
+        setError:Boolean = false
     ){
 
         binding.apply{

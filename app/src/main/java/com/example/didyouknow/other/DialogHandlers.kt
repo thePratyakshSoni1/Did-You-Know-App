@@ -59,7 +59,18 @@ class DialogHandlers( val context:Context ) {
                         actionBtn.visibility = View.VISIBLE
                         actionBtn.setBackgroundColor(Color.parseColor("#4CAF50"))
                         actionBtn.text = "Done"
+                        dialogProgressBar.visibility = View.GONE
                         dialogText.text = dialogSuccessTxt
+                    }
+
+                    Status.PARTIAL_SUCCESS -> {
+                        dialogImg.visibility = View.VISIBLE
+                        dialogImg.setImageResource(R.drawable.ic_check_filled)
+                        actionBtn.visibility = View.VISIBLE
+                        actionBtn.setBackgroundColor(Color.parseColor("#4CAF50"))
+                        actionBtn.text = "Done"
+                        dialogProgressBar.visibility = View.GONE
+                        dialogText.text = it.message
                     }
 
                     Status.ERROR ->{
@@ -68,6 +79,7 @@ class DialogHandlers( val context:Context ) {
                         actionBtn.visibility = View.VISIBLE
                         actionBtn.setBackgroundColor(Color.parseColor("#FF3636"))
                         actionBtn.text = "Back"
+                        dialogProgressBar.visibility = View.GONE
                         dialogText.text = dialogErrorTxt
 
 
@@ -111,7 +123,7 @@ class DialogHandlers( val context:Context ) {
         buttonColorResId:Int = R.color.button_color_red
     ){
 
-        val uploadStatsDialog = Dialog(context).apply {
+        Dialog(context).apply {
             setContentView(R.layout.warning_dialog)
             window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,

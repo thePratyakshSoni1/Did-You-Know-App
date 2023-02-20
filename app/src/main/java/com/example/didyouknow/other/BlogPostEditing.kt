@@ -2,13 +2,12 @@ package com.example.didyouknow.other
 
 import android.net.Uri
 import android.util.Log
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.didyouknow.data.entities.BlogPost
+import com.example.didyouknow.data.remote.BlogsDatabase
+import com.example.didyouknow.datasource.FirebaseBlogsDatasource
 import kotlinx.coroutines.runBlocking
-import java.util.*
 
 abstract class BlogPostEditing: ViewModel() {
 
@@ -41,6 +40,10 @@ abstract class BlogPostEditing: ViewModel() {
     val blogPostingStatus get() = _blogPostingStatus as LiveData<Resources<Boolean?>>
 
 
+    fun setImageLocalUri(uri: Uri?){
+        _isLocalImage.postValue(uri != null)
+        _imageUri = uri
+    }
     protected fun isContentvalid():Boolean{
         return if(postContent.value?.isNotEmpty() == true){
             true
@@ -78,14 +81,38 @@ abstract class BlogPostEditing: ViewModel() {
     }
 
     fun postValueToPostImageLink(imageLink:Pair<String?,Uri>?){
-        _isPostImgLinkUpdated = false
-        _postImgLink.postValue(imageLink?.second.toString())
-        _postImgName = imageLink?.first
+
+        if(imageLink != null ){
+            _isPostImgLinkUpdated = false
+            _postImgName = imageLink.first
+            _postImgLink.postValue(imageLink.second.toString())
+        }else{
+            _postImgLink.postValue("")
+        }
+
     }
 
     fun postImageLinkUpdateState(isUpdated:Boolean){
         _isPostImgLinkUpdated = true
     }
+
+
+    protected fun uploadImageToFirebase( blogsDatasource: FirebaseBlogsDatasource ):Resources<Pair<String,Uri>?>{
+        lateinit var imageUploadStatus:Resources<Pair<String,Uri>?>
+        return if(imageUri != null ){
+            runBlocking {
+                Log.d("ImageUploadblogEditingLogs","uploading from  uri: ${imageUri.toString()}")
+                imageUploadStatus = blogsDatasource.uploadImageForBlog(uri = imageUri!!)
+            }
+            imageUploadStatus
+        }else{
+            Log.d("AddPostViewModelLogs","Null Image uri while uploading to firebase storage")
+            imageUploadStatus = Resources.error(null,"URI IS NULL")
+            imageUploadStatus
+        }
+
+    }
+
 
     fun updateBlogTitleTxt(newTxt:String)= _postTitle.postValue(newTxt)
 
