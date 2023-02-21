@@ -48,22 +48,31 @@ class AddPostFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_post, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialoghandler = DialogHandlers(requireContext())
         binding.viewmodel = viewModel
+        dialoghandler = DialogHandlers(requireContext())
         setTextUpdaters()
         setPostButtonClickListener()
         setChooseImgButtonClickListener()
+        Log.d("AddPostFragmentLogs", "Localimage at create() is ${viewModel.isLocalImage.value}")
 
         viewModel.postimgLink.observe( viewLifecycleOwner ){
 
-            if(viewModel.imageUri != null) glide.load(viewModel.postimgLink.value).into(binding.postImagePrev)
-            viewModel.postImageLinkUpdateState(true)
+            if(!it.isNullOrEmpty() && viewModel.isLocalImage.value == false){
+                viewModel.postImageLinkUpdateState(true)
+                Log.d("AddPostFragmentLogs", "postImgLink Updated the value to $it")
+                glide.load(viewModel.postimgLink.value).into(binding.postImagePrev)
+            }
             Log.d("AddPostFragmentLogs","ImgLinkValue Changed: $it")
+        }
+
+        viewModel.isLocalImage.observe(viewLifecycleOwner){
+            Log.d("AddPostFragmentLogs", "isLocalImagge updated to: $it with uri: ${viewModel.imageUri}")
         }
 
 
@@ -71,7 +80,7 @@ class AddPostFragment : Fragment() {
         binding.cancelButton.setOnClickListener {
             dialoghandler.showWarningDialog(
                 "Discard posting blog ?",
-                positiveButtonTxt = "Keep Writting",
+                positiveButtonTxt = "Keep",
                 negativeButtonTxt = "Discard",
                 onPositiveButtonClick = { Unit },
                 onNegativeButtonClick = { findNavController().popBackStack() },
@@ -85,13 +94,15 @@ class AddPostFragment : Fragment() {
 
         if(viewModel.isLocalImage.value == true){
             viewModel.setImageLocalUri(null)
+            binding.postImagePrev.setImageURI(null)
             viewModel.postValueToPostImageLink(null)
         }else{
             val imageChooserContract = registerForActivityResult(
                 ActivityResultContracts.GetContent()
             ) {
-                binding.postImagePrev.setImageURI(it)
+                viewModel.postValueToPostImageLink(null)
                 viewModel.setImageLocalUri(it)
+                binding.postImagePrev.setImageURI(it)
             }
 
             binding.imageChooseButotn.setOnClickListener {
@@ -146,7 +157,10 @@ class AddPostFragment : Fragment() {
         }
 
         binding.blogImageLink.addTextChangedListener {
-            viewModel.updateBlogImageLinkTxt(it.toString())
+
+            viewModel.updateBlogImageLinkTxt(
+                if(viewModel.isLocalImage.value == true) "LOCAL IMAGE ADDED" else it.toString()
+            )
             Log.d("AddPostFragmentLogs","Changing img link to: ${it.toString()}")
         }
 

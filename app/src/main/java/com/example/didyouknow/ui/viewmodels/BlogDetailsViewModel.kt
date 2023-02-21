@@ -64,6 +64,10 @@ class BlogDetailsViewModel @Inject constructor(
         _isRefreshing.postValue(true)
         viewModelScope.launch {
             val result = blogsDatasource.fetchBlogById(blogDocId!!)
+
+            // if blog refrshes after updation, then image is no longer local so linkText should update
+            setImageLocalUri(null)
+
             _blog.postValue( result )
             _isRefreshing.postValue(false)
         }

@@ -67,9 +67,9 @@ class BlogDetailFragment : Fragment() {
 
 
         imageImportContract = registerForActivityResult(ActivityResultContracts.GetContent()) {
-                binding.postThumbnail.setImageURI(it)
-                viewModel.setImageLocalUri(it)
-                viewModel.postValueToPostImageLink(null)
+            viewModel.postValueToPostImageLink(null)
+            binding.postThumbnail.setImageURI(it)
+            viewModel.setImageLocalUri(it)
         }
 
 
@@ -82,9 +82,8 @@ class BlogDetailFragment : Fragment() {
     }
 
     private fun setListeners(){
-        binding.imgLinkTextView.addTextChangedListener {
-            viewModel.updateBlogImageLinkTxt(it.toString())
-        }
+
+        val dialogHandler  = DialogHandlers(requireContext())
 
         binding.toolbarNavButton.setOnClickListener {
             findNavController().popBackStack()
@@ -116,7 +115,7 @@ class BlogDetailFragment : Fragment() {
             val blogUpdateStatus = MutableLiveData<Resources<Boolean>>()
             blogUpdateStatus.postValue(Resources.loading(false))
 
-            DialogHandlers(requireContext()).showProgressDialog(
+            dialogHandler.showProgressDialog(
                 viewLifecycleOwner,
                 blogUpdateStatus,
                 onDoneClick = { Unit },
@@ -151,6 +150,8 @@ class BlogDetailFragment : Fragment() {
 
             if( viewModel.isLocalImage.value == true ){
                 viewModel.setImageLocalUri(null)
+                binding.postThumbnail.setImageURI(null)
+                viewModel.postValueToPostImageLink(null)
             }else{
                 imageImportContract.launch("image/*")
             }
@@ -158,7 +159,19 @@ class BlogDetailFragment : Fragment() {
         }
 
         binding.cancelButton.setOnClickListener {
-            viewModel.setEditingMode(false)
+            dialogHandler.showWarningDialog(
+                "Do you wan't to discard changes to the blog ?",
+                "Keep",
+                "Discard",
+                onPositiveButtonClick = {
+                    Unit
+                },
+                onNegativeButtonClick = {
+                    viewModel.setEditingMode(false)
+                },
+                buttonColorResId = R.color.button_color_green
+            )
+
         }
     }
 
@@ -173,7 +186,7 @@ class BlogDetailFragment : Fragment() {
         }
 
         binding.imgLinkTextView.addTextChangedListener {
-            viewModel.updateBlogImageLinkTxt(it.toString())
+            viewModel.updateBlogImageLinkTxt( if(viewModel.isLocalImage.value  == true ) "LOCAL IMAGE ADDED" else it.toString() )
         }
 
     }
@@ -212,10 +225,9 @@ class BlogDetailFragment : Fragment() {
         }
 
         viewModel.postimgLink.observe(viewLifecycleOwner){
-            if(!it.isNullOrEmpty()){
+            if(!it.isNullOrEmpty() && viewModel.isLocalImage.value == false){
                 viewModel.postImageLinkUpdateState(true)
                 Log.d("BlogDetailsFragment", "postImgLink Updated the value to $it")
-            }else{
                 glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
             }
         }

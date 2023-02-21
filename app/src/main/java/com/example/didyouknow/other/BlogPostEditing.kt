@@ -42,6 +42,7 @@ abstract class BlogPostEditing: ViewModel() {
 
     fun setImageLocalUri(uri: Uri?){
         _isLocalImage.postValue(uri != null)
+        Log.d("BlgEditingVmLogs","LocalImageUri set to ${isLocalImage.value}")
         _imageUri = uri
     }
     protected fun isContentvalid():Boolean{
