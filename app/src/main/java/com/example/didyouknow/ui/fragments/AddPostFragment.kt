@@ -60,8 +60,8 @@ class AddPostFragment : Fragment() {
         setChooseImgButtonClickListener()
 
         viewModel.postimgLink.observe( viewLifecycleOwner ){
-            glide.load(viewModel.postimgLink.value).into(binding.postImagePrev)
-            if(viewModel.image)
+
+            if(viewModel.imageUri != null) glide.load(viewModel.postimgLink.value).into(binding.postImagePrev)
             viewModel.postImageLinkUpdateState(true)
             Log.d("AddPostFragmentLogs","ImgLinkValue Changed: $it")
         }

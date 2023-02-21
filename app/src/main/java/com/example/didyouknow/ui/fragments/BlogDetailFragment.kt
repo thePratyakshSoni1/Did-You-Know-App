@@ -24,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 
@@ -140,7 +141,9 @@ class BlogDetailFragment : Fragment() {
                     toast = result.message!!
                     blogUpdateStatus.postValue(Resources.error(false, "Can't post blog !"))
                 }
-                Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main){
+                    Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -209,8 +212,9 @@ class BlogDetailFragment : Fragment() {
         }
 
         viewModel.postimgLink.observe(viewLifecycleOwner){
-            if(it != ""){
+            if(!it.isNullOrEmpty()){
                 viewModel.postImageLinkUpdateState(true)
+                Log.d("BlogDetailsFragment", "postImgLink Updated the value to $it")
             }else{
                 glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
             }
