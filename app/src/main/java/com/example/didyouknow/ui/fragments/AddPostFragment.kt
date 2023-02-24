@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.addTextChangedListener
@@ -24,6 +25,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 
 @AndroidEntryPoint
 class AddPostFragment : Fragment() {
@@ -34,12 +37,13 @@ class AddPostFragment : Fragment() {
     private var _binding :FragmentAddPostBinding? = null
     val binding get() = _binding!!
 
+    private lateinit var imageChoosContract: ActivityResultLauncher<String>
+
     private val viewModel:AddpostFragmentViewModel by viewModels()
     lateinit private var dialoghandler:DialogHandlers
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -52,27 +56,39 @@ class AddPostFragment : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    super.onViewCreated(view, savedInstanceState)
+
+        imageChoosContract =  registerForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) {
+            viewModel.postValueToPostImageLink(null)
+            viewModel.setImageLocalUri(it)
+            binding.postImagePrev.setImageURI(it)
+        }
+
         binding.viewmodel = viewModel
         dialoghandler = DialogHandlers(requireContext())
         setTextUpdaters()
         setPostButtonClickListener()
-        setChooseImgButtonClickListener()
+        setChooseImgButtonClickListener() // it's not going inside the function need to debug that :)
         Log.d("AddPostFragmentLogs", "Localimage at create() is ${viewModel.isLocalImage.value}")
 
         viewModel.postimgLink.observe( viewLifecycleOwner ){
 
-            if(!it.isNullOrEmpty() && viewModel.isLocalImage.value == false){
+            if(!it.isNullOrEmpty()){
                 viewModel.postImageLinkUpdateState(true)
                 Log.d("AddPostFragmentLogs", "postImgLink Updated the value to $it")
-                glide.load(viewModel.postimgLink.value).into(binding.postImagePrev)
+                if(viewModel.isLocalImage.value == false){
+                    glide.load(viewModel.postimgLink.value).into(binding.postImagePrev)
+                }
             }
             Log.d("AddPostFragmentLogs","ImgLinkValue Changed: $it")
         }
 
         viewModel.isLocalImage.observe(viewLifecycleOwner){
-            Log.d("AddPostFragmentLogs", "isLocalImagge updated to: $it with uri: ${viewModel.imageUri}")
+            Log.d("AddPostFragmentLogs", "isLocalImagge updated to: ${viewModel.isLocalImage.value} with uri: ${viewModel.imageUri} while observer: $it")
         }
 
 
@@ -92,22 +108,16 @@ class AddPostFragment : Fragment() {
 
     private fun setChooseImgButtonClickListener(){
 
-        if(viewModel.isLocalImage.value == true){
-            viewModel.setImageLocalUri(null)
-            binding.postImagePrev.setImageURI(null)
-            viewModel.postValueToPostImageLink(null)
-        }else{
-            val imageChooserContract = registerForActivityResult(
-                ActivityResultContracts.GetContent()
-            ) {
+        binding.imageChooseButotn.setOnClickListener {
+            if(viewModel.isLocalImage.value!!){
+                Log.d("AddPostFragmentLogs","isLocalImg: ${viewModel.isLocalImage.value} removing image")
+                viewModel.setImageLocalUri(null)
+                binding.postImagePrev.setImageURI(null)
                 viewModel.postValueToPostImageLink(null)
-                viewModel.setImageLocalUri(it)
-                binding.postImagePrev.setImageURI(it)
-            }
-
-            binding.imageChooseButotn.setOnClickListener {
-                imageChooserContract.launch("image/*")
-            }
+            }else{
+                Log.d("AddPostFragmentLogs","isLocalImg: ${viewModel.isLocalImage.value} choosing Image")
+                    imageChoosContract.launch("image/*")
+                }
         }
 
     }

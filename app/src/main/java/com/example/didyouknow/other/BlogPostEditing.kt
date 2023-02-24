@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 abstract class BlogPostEditing: ViewModel() {
 
+    val LocalImageTxtPlaceholder = "LOCAL IMAGE ADDED"
 
     protected var isvalidImage:Boolean = true
 
@@ -42,7 +43,8 @@ abstract class BlogPostEditing: ViewModel() {
 
     fun setImageLocalUri(uri: Uri?){
         _isLocalImage.postValue(uri != null)
-        Log.d("BlgEditingVmLogs","LocalImageUri set to ${isLocalImage.value}")
+        Log.d("BlgEditingVmLogs","LocalImageUri set to ${isLocalImage.value} because uri is ($uri == null) = ${uri == null}")
+        Log.d("BlgEditingVmLogs","because uri is $uri ")
         _imageUri = uri
     }
     protected fun isContentvalid():Boolean{

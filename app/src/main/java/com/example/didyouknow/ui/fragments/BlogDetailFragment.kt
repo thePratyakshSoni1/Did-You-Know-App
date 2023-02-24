@@ -186,7 +186,9 @@ class BlogDetailFragment : Fragment() {
         }
 
         binding.imgLinkTextView.addTextChangedListener {
-            viewModel.updateBlogImageLinkTxt( if(viewModel.isLocalImage.value  == true ) "LOCAL IMAGE ADDED" else it.toString() )
+            viewModel.updateBlogImageLinkTxt(
+                if(viewModel.isLocalImage.value  == true ) "LOCAL IMAGE ADDED" else it.toString()
+            )
         }
 
     }
@@ -225,10 +227,12 @@ class BlogDetailFragment : Fragment() {
         }
 
         viewModel.postimgLink.observe(viewLifecycleOwner){
-            if(!it.isNullOrEmpty() && viewModel.isLocalImage.value == false){
+            if(!it.isNullOrEmpty() ){
                 viewModel.postImageLinkUpdateState(true)
                 Log.d("BlogDetailsFragment", "postImgLink Updated the value to $it")
-                glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
+                if(viewModel.isLocalImage.value == false){
+                    glide.load(viewModel.postimgLink.value).into(binding.postThumbnail)
+                }
             }
         }
 
