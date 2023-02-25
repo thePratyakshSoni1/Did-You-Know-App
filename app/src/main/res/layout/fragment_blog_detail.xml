@@ -198,6 +198,7 @@
                             android:layout_marginTop="8dp"
                             android:background="@drawable/textfiled_shape"
                             android:orientation="vertical"
+                            android:visibility="@{viewmodel.isEditingMode() ? View.GONE : View.VISIBLE}"
                             android:padding="12dp">
 
 
@@ -325,6 +326,7 @@
                                 android:enabled="@{ viewmodel.isEditingMode() &amp;&amp; !(viewmodel.isLocalImage() == true) }"
                                 android:padding="12dp"
                                 android:text="@{ viewmodel.postimgLink }"
+                                android:hint="@{ viewmodel.isLocalImage() ? @string/imgLinkTxtLocalImagePlaceholder : @string/imgLinkTextPLaceholder }"
                                 android:textColor="@color/post_text"
                                 android:textSize="14sp"
                                 app:layout_constraintBottom_toBottomOf="parent"

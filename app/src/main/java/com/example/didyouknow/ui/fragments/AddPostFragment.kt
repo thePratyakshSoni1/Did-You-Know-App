@@ -1,5 +1,7 @@
 package com.example.didyouknow.ui.fragments
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.net.Uri
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 
 @AndroidEntryPoint
@@ -40,7 +43,7 @@ class AddPostFragment : Fragment() {
     private lateinit var imageChoosContract: ActivityResultLauncher<String>
 
     private val viewModel:AddpostFragmentViewModel by viewModels()
-    lateinit private var dialoghandler:DialogHandlers
+    private lateinit var dialoghandler:DialogHandlers
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +56,28 @@ class AddPostFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_post, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner, object: OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    dialoghandler.showWarningDialog(
+                        "Discard Adding Blog Post ?",
+                        "Discard",
+                        "Keep",
+                        onPositiveButtonClick = { findNavController().popBackStack() },
+                        onNegativeButtonClick = { Unit },
+
+                        dialogImgRes = AppCompatResources.getDrawable(
+                            requireContext(), R.drawable.ic_edit)!!.apply { setTint(
+                            resources.getColor(R.color.toolbar_text, requireActivity().theme)) },
+
+                        buttonColorResId = R.color.button_color_green
+                    )
+                }
+            }
+        )
+
+
         return binding.root
     }
 
@@ -70,6 +95,8 @@ class AddPostFragment : Fragment() {
 
         binding.viewmodel = viewModel
         dialoghandler = DialogHandlers(requireContext())
+
+
         setTextUpdaters()
         setPostButtonClickListener()
         setChooseImgButtonClickListener() // it's not going inside the function need to debug that :)
@@ -168,9 +195,7 @@ class AddPostFragment : Fragment() {
 
         binding.blogImageLink.addTextChangedListener {
 
-            viewModel.updateBlogImageLinkTxt(
-                if(viewModel.isLocalImage.value == true) "LOCAL IMAGE ADDED" else it.toString()
-            )
+            viewModel.updateBlogImageLinkTxt(it.toString())
             Log.d("AddPostFragmentLogs","Changing img link to: ${it.toString()}")
         }
 

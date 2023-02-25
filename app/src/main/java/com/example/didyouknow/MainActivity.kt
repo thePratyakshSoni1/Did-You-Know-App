@@ -1,5 +1,6 @@
 package com.example.didyouknow
 
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -19,8 +20,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController:NavHostFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_DidYouKnow)
+        theme.applyStyle(R.style.Theme_DidYouKnow, true)
+        super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         navController = supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
 

@@ -1,6 +1,8 @@
 package com.example.didyouknow.ui.fragments
 
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,8 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -37,6 +41,7 @@ class BlogDetailFragment : Fragment() {
     private var _binding: FragmentBlogDetailBinding? = null
     val binding: FragmentBlogDetailBinding get() = _binding!!
 
+    lateinit var dialogHandler: DialogHandlers
     private val viewModel by viewModels<BlogDetailsViewModel>()
 
     lateinit var imageImportContract: ActivityResultLauncher<String>
@@ -54,6 +59,32 @@ class BlogDetailFragment : Fragment() {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_blog_detail, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner, object: OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if(viewModel.getInfoAboutFieldsToUpdate().isNotEmpty() && viewModel.isEditingMode.value!! ){
+                        dialogHandler.showWarningDialog(
+                            "Discard all changes to the Blog ?",
+                            "Discard",
+                            "Back",
+                            onPositiveButtonClick = {
+                                viewModel.setEditingMode(false)
+                                viewModel.refreshBlog()
+                            },
+                            onNegativeButtonClick = {
+                                Unit
+                                                    },
+                            dialogImgRes = AppCompatResources.getDrawable(
+                                requireContext(), R.drawable.ic_edit)!!.apply { setTint(
+                                resources.getColor(R.color.toolbar_text, requireActivity().theme)) }
+                        )
+                    }else{
+                        findNavController().popBackStack()
+                    }
+                } })
+
+
         return binding.root
     }
 
@@ -61,10 +92,7 @@ class BlogDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.viewmodel = viewModel
-        setListeners()
-        setObservers()
-        setTextUpdaters()
-
+        dialogHandler = DialogHandlers(requireContext())
 
         imageImportContract = registerForActivityResult(ActivityResultContracts.GetContent()) {
             viewModel.postValueToPostImageLink(null)
@@ -72,6 +100,10 @@ class BlogDetailFragment : Fragment() {
             viewModel.setImageLocalUri(it)
         }
 
+
+        setListeners()
+        setObservers()
+        setTextUpdaters()
 
         viewModel.initializeViewModel(
             blogId = arguments?.getString(NavigationKeys.KEY_BLOG_DOC_ID)!!,
@@ -82,8 +114,6 @@ class BlogDetailFragment : Fragment() {
     }
 
     private fun setListeners(){
-
-        val dialogHandler  = DialogHandlers(requireContext())
 
         binding.toolbarNavButton.setOnClickListener {
             findNavController().popBackStack()
@@ -151,7 +181,7 @@ class BlogDetailFragment : Fragment() {
             if( viewModel.isLocalImage.value == true ){
                 viewModel.setImageLocalUri(null)
                 binding.postThumbnail.setImageURI(null)
-                viewModel.postValueToPostImageLink(null)
+                viewModel.postValueToPostImageLink(null to Uri.parse(viewModel.blog.value?.data?.imageUrl))
             }else{
                 imageImportContract.launch("image/*")
             }
@@ -187,7 +217,7 @@ class BlogDetailFragment : Fragment() {
 
         binding.imgLinkTextView.addTextChangedListener {
             viewModel.updateBlogImageLinkTxt(
-                if(viewModel.isLocalImage.value  == true ) "LOCAL IMAGE ADDED" else it.toString()
+                it.toString()
             )
         }
 

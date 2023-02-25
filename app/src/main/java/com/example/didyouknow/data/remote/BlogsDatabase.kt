@@ -90,14 +90,19 @@ class BlogsDatabase {
         }
 
     }
-    suspend fun updateBlogImage( newImgLink:String, articleId:String ):Resources<Boolean>{
+    suspend fun updateBlogImage( newImgLink:String, articleId:String, imgName:String? ):Resources<Boolean>{
 
         val docRef = fbCollection.document(articleId)
         val task = docRef.update(
             FirebaseDocFieldNames.BlogImageLinkField, newImgLink
         )
 
+        val taskName = docRef.update(
+            FirebaseDocFieldNames.BlogsImageNameField, imgName
+        )
+
         task.await()
+        taskName.await()
         return if(task.isSuccessful){
             Resources.success(true)
         }else{

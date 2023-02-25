@@ -51,7 +51,6 @@ class BlogDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshing.postValue(true)
             val result = blogsDatasource.fetchBlogById(blogId)
-            delay(3000 )
             _blog.postValue( result )
             if(openForEditMode) _isEditingMode.postValue(true)
             _isRefreshing.postValue(false)
@@ -67,7 +66,6 @@ class BlogDetailsViewModel @Inject constructor(
 
             // if blog refrshes after updation, then image is no longer local so linkText should update
             setImageLocalUri(null)
-
             _blog.postValue( result )
             _isRefreshing.postValue(false)
         }
@@ -86,7 +84,7 @@ class BlogDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun getInfoAboutFieldsToUpdate():List<FirebaseDocFields>{
+    fun getInfoAboutFieldsToUpdate():List<FirebaseDocFields>{
 
         val fieldsToUpdate = mutableListOf<FirebaseDocFields>()
         blog.value?.data.let {
@@ -141,27 +139,11 @@ class BlogDetailsViewModel @Inject constructor(
                                 val imageUploadTask = uploadImageToFirebase(blogsDatasource)
                                 if(imageUploadTask.status == Status.SUCCESS){
                                     val imageLink = imageUploadTask.data
-                                    viewModelScope.launch{
-                                        postValueToPostImageLink(imageLink)
-                                    }
-                                    var delayTaken = 0L
-
-                                    //postImgLink is updating late so waiting for that
-                                    while(!isPostImgLinkUpdated && delayTaken < 5000L ){
-                                        delayTaken+= 200L
-                                        delay(200L)
-                                    }
-
-                                    if(isPostImgLinkUpdated){
-                                        logConsole("Link we got: ${postimgLink.value} from ${imageLink.toString()}")
-                                        logConsole(imageLink.toString())
-                                        blogsDatasource.updateBlogImage(postimgLink.value.toString(), blog.value?.data?.articleId!!)
-                                    }else{
-                                        logConsole("Error attaching link to blogPost, value update timeout")
-                                        val deleteImageTask = blogsDatasource.deleteBlogImage(imageUploadTask.data!!.first)
-                                        logConsole("Deleteing uploaded image success: ${deleteImageTask.data}")
-                                        Resources.error(false,"Error attaching link to blogPost\nPlease  try again")
-                                    }
+                                    logConsole("Link we got: ${imageLink.toString()}")
+                                    logConsole(imageLink.toString())
+                                    blogsDatasource.updateBlogImage(imageLink?.second.toString(), blog.value?.data?.articleId!!,
+                                            imageLink?.first
+                                    )
                                 }else{
                                     Resources.error(false, "Image can't be uploaded")
                                 }

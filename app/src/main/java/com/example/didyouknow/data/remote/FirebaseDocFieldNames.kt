@@ -11,6 +11,7 @@ object FirebaseDocFieldNames {
     val BlogArticleIdField:String = "articleId"
     val BlogLikesField:String = "totalLikes"
     val BlogDislikesField:String = "totalDislikes"
+    val BlogsImageNameField:String = "imageName"
 
 
 }
