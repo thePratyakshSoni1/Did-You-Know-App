@@ -21,7 +21,59 @@
             app:layout_constraintTop_toTopOf="parent"
             app:subtitleTextColor="@color/toolbar_text"
             app:title="Did You Know"
-            app:titleTextColor="@color/toolbar_text" />
+            app:titleTextColor="@color/toolbar_text">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"
+                    android:text="Did You Know"
+                    android:textColor="@color/toolbar_text"
+                    android:textSize="16dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/blogSearchbar"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/blogSearchbar"
+                    android:layout_width="180dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/searchbar_shape"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="6dp"
+                    android:paddingStart="42dp"
+                    android:text="Search blogs"
+                    android:textColor="@color/add_post_hint"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/blogSearchbar"
+                    app:layout_constraintStart_toStartOf="@+id/blogSearchbar"
+                    app:layout_constraintTop_toTopOf="@+id/blogSearchbar"
+                    app:srcCompat="@drawable/ic_search_"
+                    app:tint="@color/button_icons_tint" />
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refreshLayout"

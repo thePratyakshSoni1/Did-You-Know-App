@@ -22,6 +22,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.navigation.NavDeepLink
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -69,6 +71,11 @@ class HomeFeedFragment : Fragment() {
 //        Toast.makeText(requireContext(),"You Are in HomeFrag", Toast.LENGTH_SHORT).show()
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = blogsAdapter
+
+        binding.blogSearchbar.setOnClickListener {
+            val action:NavDirections = HomeFeedFragmentDirections.actionHomeFeedFragmentToSearchFragment()
+            findNavController().navigate(action)
+        }
 
         refreshBlogs()
         addListenerstoAdapter()

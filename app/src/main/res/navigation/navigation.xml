@@ -43,5 +43,17 @@
         <action
             android:id="@+id/action_homeFeedFragment_to_addPostFragment"
             app:destination="@id/addPostFragment" />
+        <action
+            android:id="@+id/action_homeFeedFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.didyouknow.ui.fragments.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_blogDetailFragment"
+            app:destination="@id/blogDetailFragment" />
     </fragment>
 </navigation>

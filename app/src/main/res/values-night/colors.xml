@@ -9,6 +9,9 @@
     <color name="toolbar">#1F1F1F</color>
     <color name="toolbar_text">#FFFFFF</color>
     <color name="post_background">#1F1F1F</color>
+    <color name="searchbar">#050505</color>
+
+    <color name="searchbar_item_card">#1F1F1F</color>
 
     <color name="add_post_text_field">#202020</color>
     <color name="add_post_hint">#787878</color>
